@@ -1394,7 +1394,7 @@ require_once __DIR__ . '/includes/header.php';
         class="elysian-btn elysian-btn-brand px-6 py-2.5 text-xs font-bold shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
         Complete Assessment →
       </button>
-    <?php elseif (in_array($currentComp['type'], ['content_only', 'content_block', 'video_embed', 'callout_box', 'resource_link', 'h1', 'h2', 'h3', 'h4', 'paragraph', 'result_reveal'])): ?>
+    <?php elseif (in_array($currentComp['type'], ['content_only', 'content_block', 'video_embed', 'callout_box', 'resource_link', 'h1', 'h2', 'h3', 'h4', 'paragraph', 'result_reveal', 'composite'])): ?>
       <button type="submit" form="main-form" class="elysian-btn elysian-btn-brand px-6 py-2.5 text-xs font-bold shadow-md flex items-center gap-2">
         Continue →
       </button>

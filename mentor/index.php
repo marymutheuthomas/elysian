@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/profiles.php';
 require_once __DIR__ . '/../includes/evaluation_engine.php';
+require_once __DIR__ . '/../includes/component_type.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -381,7 +382,9 @@ if ($is_logged_in) {
             $b_pillar_id = $stmt_pp->fetchColumn() ?: '';
         }
         $b_content_schema_raw = isset($_POST['b_content_schema']) ? trim($_POST['b_content_schema']) : '';
-        $b_type          = isset($_POST['b_type']) ? trim($_POST['b_type']) : 'short_answer';
+        // No explicit type selector is submitted by the composite block builder — the
+        // real type is inferred from content_schema below, once it's been decoded.
+        $b_type          = isset($_POST['b_type']) ? trim($_POST['b_type']) : '';
         $b_question      = isset($_POST['b_question']) ? trim($_POST['b_question']) : '';
         $b_placeholder   = isset($_POST['b_placeholder']) ? trim($_POST['b_placeholder']) : '';
         $b_required      = isset($_POST['b_required']) ? 1 : 0;
@@ -439,10 +442,12 @@ if ($is_logged_in) {
         }
 
         $content_schema_val = null;
+        $decoded_schema_for_type = null;
         if (!empty($b_content_schema_raw)) {
             $dec_cs = json_decode($b_content_schema_raw, true);
             if (json_last_error() === JSON_ERROR_NONE && is_array($dec_cs) && count($dec_cs) > 0) {
                 $content_schema_val = $b_content_schema_raw;
+                $decoded_schema_for_type = $dec_cs;
                 if (empty($b_question)) {
                     foreach ($dec_cs as $elem) {
                         if (!empty($elem['text'])) { $b_question = $elem['text']; break; }
@@ -453,6 +458,12 @@ if ($is_logged_in) {
                     if (empty($b_question)) $b_question = 'Custom Component Block';
                 }
             }
+        }
+
+        // Auto-infer `type` from the content_schema's primary element rather than
+        // silently defaulting to a stale/incorrect legacy value.
+        if (empty($b_type)) {
+            $b_type = inferComponentType($decoded_schema_for_type);
         }
 
         if (!empty($b_block_id)) {
@@ -967,7 +978,7 @@ require_once __DIR__ . '/../includes/header.php';
               $answered_count = count($s_answers);
               $total_blocks_count = 0;
               if (!empty($sel_stud['selected_program_id'])) {
-                  $stmt_tot = $pdo->prepare("SELECT COUNT(*) FROM `components` c JOIN `pillars` p ON c.pillar_id = p.id WHERE p.program_id = ? AND c.type NOT IN ('content_only', 'content_block', 'video_embed', 'h1', 'h2', 'h3', 'h4', 'paragraph', 'result_reveal')");
+                  $stmt_tot = $pdo->prepare("SELECT COUNT(*) FROM `components` c JOIN `pillars` p ON c.pillar_id = p.id WHERE p.program_id = ? AND c.type NOT IN ('content_only', 'content_block', 'video_embed', 'h1', 'h2', 'h3', 'h4', 'paragraph', 'result_reveal', 'composite')");
                   $stmt_tot->execute([$sel_stud['selected_program_id']]);
                   $total_blocks_count = (int)$stmt_tot->fetchColumn();
               }
@@ -1846,6 +1857,7 @@ require_once __DIR__ . '/../includes/header.php';
                                   'paragraph'     => 'Paragraph',
                                   'branching','scoring' => 'Multiple Choice',
                                   'result_reveal' => 'Result Reveal',
+                                  'composite'     => 'Composite (Empty)',
                                   default         => strtoupper($blk['type'])
                                 };
                                 $badge_cls = match($blk['type']) {
@@ -1856,6 +1868,7 @@ require_once __DIR__ . '/../includes/header.php';
                                   'video_embed' => 'bg-purple-100 text-purple-800 border-purple-300',
                                   'scoring_block','goal' => 'bg-amber-100 text-amber-800 border-amber-300',
                                   'h1','h2','h3','h4','paragraph' => 'bg-gray-100 text-gray-700 border-gray-300',
+                                  'composite' => 'bg-red-100 text-red-700 border-red-300',
                                   default => 'bg-gray-100 text-gray-700 border-gray-300'
                                 };
                                 ?>
