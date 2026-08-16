@@ -31,7 +31,7 @@ $html_class = '';
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -45,8 +45,8 @@ $html_class = '';
       theme: {
         extend: {
           fontFamily: {
-            sans:    ['Inter',  'system-ui', '-apple-system', 'sans-serif'],
-            display: ['Outfit', 'system-ui', '-apple-system', 'sans-serif'],
+            sans:    ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif'],
           },
           colors: {
             'brand-blue':         '#0F172A',
@@ -221,7 +221,7 @@ $html_class = '';
 
     /* ── Typography ──────────────────────────────────────────── */
     h1, h2, h3, h4, h5, h6 {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
       color: var(--color-text);
     }
 
