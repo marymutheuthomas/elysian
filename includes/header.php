@@ -746,7 +746,26 @@ $html_class = '';
         </a>
 
       <?php elseif (isset($_SESSION['mentor_logged_in']) && $_SESSION['mentor_logged_in'] === true): ?>
-        <div class="flex items-center gap-1.5 text-xs font-semibold py-2.5 px-3 min-h-[44px]" style="color:var(--color-text-muted);">
+        <?php
+        // Same tab list mentor/index.php's sidebar renders — mirrored here
+        // so mobile has one hamburger/drawer instead of two separate menus.
+        $mh_active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'students';
+        $mh_tabs = [
+            'students'   => 'Student Registry',
+            'payments'   => 'Reconciliation Panel',
+            'programs'   => 'Program Database',
+            'pillars'    => 'Pillar Content',
+            'archetypes' => '16-Archetype Manager',
+        ];
+        ?>
+        <?php foreach ($mh_tabs as $mh_key => $mh_label): ?>
+          <a href="/mentor/index.php?tab=<?php echo $mh_key; ?>"
+             class="flex items-center w-full min-h-[44px] py-2.5 px-3 rounded-lg text-sm font-bold <?php echo $mh_active_tab === $mh_key ? 'bg-[#FF9D9D]/20 text-gray-900' : 'text-gray-600 hover:bg-gray-50'; ?>">
+            <?php echo htmlspecialchars($mh_label); ?>
+          </a>
+        <?php endforeach; ?>
+
+        <div class="flex items-center gap-1.5 text-xs font-semibold py-2.5 px-3 min-h-[44px] mt-2 border-t border-gray-100" style="color:var(--color-text-muted);">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
           <span style="color:var(--color-gold);">Elysian Mentor</span>
         </div>

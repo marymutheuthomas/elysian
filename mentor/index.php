@@ -744,30 +744,12 @@ require_once __DIR__ . '/../includes/header.php';
   ?>
 
   <div class="flex flex-col lg:flex-row gap-6 w-full min-h-full py-2 px-1">
-    <!-- Tab navigation -->
-    <aside class="w-full lg:w-64 flex-shrink-0">
+    <!-- Tab navigation (desktop/tablet-landscape only — on mobile the
+         same tab links live in the global header's hamburger drawer,
+         so there's a single menu instead of two) -->
+    <aside class="hidden lg:block lg:w-64 flex-shrink-0">
       <div class="elysian-card p-5 shadow-md sticky top-4">
-        <!-- Mobile/Tablet Only Header block inside Sidebar
-             (identity/logout already live in the global header above —
-             this row is just the toggle for the tab menu below) -->
-        <div class="lg:hidden flex items-center justify-between border-b border-gray-200 pb-4 mb-4 gap-3">
-          <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">
-            Menu Navigation
-          </span>
-          <button type="button" id="mentor-mobile-nav-toggle" onclick="toggleMentorMobileNav()"
-                  class="inline-flex items-center justify-center w-11 h-11 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
-                  aria-label="Toggle menu" aria-expanded="false" aria-controls="mentor-mobile-nav">
-            <svg id="mentor-mobile-nav-icon-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            <svg id="mentor-mobile-nav-icon-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div id="mentor-mobile-nav" class="hidden lg:block">
-        <span class="hidden lg:block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">
           Menu Navigation
         </span>
         <nav class="space-y-1.5">
@@ -821,23 +803,8 @@ require_once __DIR__ . '/../includes/header.php';
             16-Archetype Manager
           </a>
         </nav>
-        </div>
       </div>
     </aside>
-
-    <script>
-      function toggleMentorMobileNav() {
-        var menu = document.getElementById('mentor-mobile-nav');
-        var iconOpen = document.getElementById('mentor-mobile-nav-icon-open');
-        var iconClose = document.getElementById('mentor-mobile-nav-icon-close');
-        var btn = document.getElementById('mentor-mobile-nav-toggle');
-        var wasHidden = menu.classList.contains('hidden');
-        menu.classList.toggle('hidden');
-        iconOpen.classList.toggle('hidden');
-        iconClose.classList.toggle('hidden');
-        btn.setAttribute('aria-expanded', wasHidden ? 'true' : 'false');
-      }
-    </script>
 
     <!-- Content Workspace -->
     <main class="flex-1 min-w-0 flex flex-col">
