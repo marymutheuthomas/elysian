@@ -66,70 +66,87 @@ $html_class = '';
        DESIGN SYSTEM — CSS TOKENS & COMPONENT STYLES
   ══════════════════════════════════════════════════════════════ -->
   <style>
-    /* ── Color Tokens ─────────────────────────────────────────── */
+    /* ── Color Tokens — Official Palette (Forced Light Theme) ──── */
     :root {
-      /* ── Custom 4-Color Pastel Palette ─────────────────────── */
-      --coral-red:   #FF9D9D;    /* Accent Red / Warnings / Required Tags */
-      --peach-soft:  #FFC5AA;    /* Soft Peach / Active States / Secondary Accents */
-      --sage-yellow: #EEF8CD;    /* Soft Sage Yellow / Highlight Cards / Callouts */
-      --mint-green:  #BBF1D2;    /* Mint Green / Success Badges / Primary CTAs */
+      /* Canvas & Card Surfaces */
+      --color-bg: #FAF9F6;
+      --color-surface: #FFFFFF;
+      --color-surface-subtle: #F8FAFC;
+      --color-border: #E2E8F0;
+      --color-text-main: #0F172A;
+      --color-text-muted: #64748B;
 
-      /* ── Neutral Surfaces & Typography ─────────────────────── */
-      --bg-main:      #FAF9F6;   /* Warm Crisp Background Canvas */
-      --surface-card: #FFFFFF;   /* Pure White Bento Tiles */
-      --surface-subtle: #F7FDF5; /* Sage-tinted nested surface */
-      --border-subtle: #E2E8F0;  /* Subtle Card Border */
-      --text-main:    #1E293B;   /* High-Contrast Slate Body Text */
-      --text-muted:   #64748B;   /* Subtitle & Label Text */
+      /* Logo Core Colors */
+      --color-brand-primary: #3F00FF;
+      --color-brand-hover: #2E00B3;
+      --color-brand-gold: #FFD700;
+      --color-brand-gold-dark: #B88600;
 
-      /* ── Status ─────────────────────────────────────────────── */
-      --status-success:  var(--mint-green);
-      --status-danger:   var(--coral-red);
-      --status-required: #D63384;   /* Pink-Red for Req badges */
+      /* Soft Tints for Light Cards */
+      --color-tint-blue: #EEF2FF;
+      --color-tint-gold: #FFFBEB;
 
-      /* ── Component Aliases ──────────────────────────────────── */
-      --color-bg:          var(--bg-main);
-      --color-surface:     var(--surface-card);
-      --color-border:      var(--border-subtle);
-      --color-text:        var(--text-main);
-      --color-text-muted:  var(--text-muted);
+      /* Status Colors */
+      --color-success: #10B981;
+      --color-danger: #EF4444;
 
-      /* Keep brand/legacy aliases pointing to pastel equivalents */
-      --brand-primary:      #2E7D52;        /* Dark Mint — readable CTA text bg */
-      --brand-hover:        #1B5E38;        /* Deeper Mint Hover */
-      --brand-primary-glow: rgba(187, 241, 210, 0.40);
-
-      --navy-dark:          var(--text-main);
-      --blue-vibrant:       #2563EB;        /* kept for inline references */
-      --blue-primary:       #2563EB;
-      --blue-hover:         #1D4ED8;
-      --blue-light:         var(--sage-yellow);
-      --gold-vibrant:       #D97706;
-      --gold-accent:        #D97706;
-      --gold-light:         var(--peach-soft);
-      --gold-border:        var(--coral-red);
-
-      --brand-blue-deep:    var(--text-main);
-      --brand-blue-primary: #2563EB;
-      --brand-blue-soft:    var(--sage-yellow);
-      --brand-gold-primary: #D97706;
-      --brand-gold-soft:    var(--peach-soft);
-      --brand-gold-border:  var(--coral-red);
-
-      --color-blue:         var(--text-main);
-      --color-gold:         #D97706;
-      --color-gold-dark:    #B45309;
-      --color-gold-glow:    rgba(255, 197, 170, 0.35); /* peach glow */
-      --color-cyan:         #2563EB;
-      --color-cyan-dark:    #1D4ED8;
-      --color-cyan-glow:    rgba(187, 241, 210, 0.35); /* mint glow */
-      --color-emerald:      #059669;
+      /* ── Legacy aliases ───────────────────────────────────────
+         Every custom property name already referenced across
+         header/footer/tunnel/completed is kept here, repointed at
+         the palette above, so the rebrand applies everywhere
+         without a page-by-page rewrite. ───────────────────────── */
+      --color-text:        var(--color-text-main);
+      --color-blue:         var(--color-brand-primary);
+      --color-gold:         var(--color-brand-gold);
+      --color-gold-dark:    var(--color-brand-gold-dark);
+      --color-gold-glow:    rgba(255, 215, 0, 0.35);
+      --color-cyan:         var(--color-brand-primary);
+      --color-cyan-dark:    var(--color-brand-hover);
+      --color-cyan-glow:    rgba(63, 0, 255, 0.20);
+      --color-emerald:      var(--color-success);
       --color-emerald-dark: #047857;
 
-      /* ── Shadows (warm tinted) ──────────────────────────────── */
-      --shadow-sm:   0 1px 3px rgba(30,41,59,0.06), 0 1px 2px rgba(30,41,59,0.04);
-      --shadow-md:   0 4px 16px rgba(30,41,59,0.08);
-      --shadow-lg:   0 8px 32px rgba(30,41,59,0.10);
+      --status-success:  var(--color-success);
+      --status-danger:   var(--color-danger);
+      --status-required: #D63384;   /* Pink-Red for Req badges */
+
+      --brand-primary:      var(--color-brand-primary);
+      --brand-hover:        var(--color-brand-hover);
+      --brand-primary-glow: rgba(63, 0, 255, 0.18);
+
+      --bg-main:        var(--color-bg);
+      --surface-card:   var(--color-surface);
+      --surface-subtle: var(--color-surface-subtle);
+      --border-subtle:  var(--color-border);
+      --text-main:      var(--color-text-main);
+      --text-muted:     var(--color-text-muted);
+
+      --mint-green:   var(--color-tint-blue);
+      --coral-red:    var(--color-danger);
+      --sage-yellow:  var(--color-tint-blue);
+      --peach-soft:   var(--color-tint-gold);
+
+      --navy-dark:          var(--color-text-main);
+      --blue-vibrant:       var(--color-brand-primary);
+      --blue-primary:       var(--color-brand-primary);
+      --blue-hover:         var(--color-brand-hover);
+      --blue-light:         var(--color-tint-blue);
+      --gold-vibrant:       var(--color-brand-gold-dark);
+      --gold-accent:        var(--color-brand-gold-dark);
+      --gold-light:         var(--color-tint-gold);
+      --gold-border:        var(--color-brand-gold);
+
+      --brand-blue-deep:    var(--color-text-main);
+      --brand-blue-primary: var(--color-brand-primary);
+      --brand-blue-soft:    var(--color-tint-blue);
+      --brand-gold-primary: var(--color-brand-gold-dark);
+      --brand-gold-soft:    var(--color-tint-gold);
+      --brand-gold-border:  var(--color-brand-gold);
+
+      /* ── Shadows ────────────────────────────────────────────── */
+      --shadow-sm:   0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+      --shadow-md:   0 4px 16px rgba(15,23,42,0.08);
+      --shadow-lg:   0 8px 32px rgba(15,23,42,0.10);
       --shadow-gold: 0 0 0 3px var(--color-gold-glow);
       --shadow-cyan: 0 0 0 3px var(--color-cyan-glow);
 
@@ -157,6 +174,7 @@ $html_class = '';
       overflow-x: hidden;
     }
 
+    /* Enforce light theme globally */
     body {
       min-height: 100vh;
       width: 100%;
@@ -164,8 +182,8 @@ $html_class = '';
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      background-color: var(--color-bg);
-      color: var(--color-text);
+      background-color: var(--color-bg) !important;
+      color: var(--color-text-main) !important;
       font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       transition: background-color 0.25s ease, color 0.25s ease;
     }
