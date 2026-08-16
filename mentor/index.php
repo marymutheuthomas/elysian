@@ -2096,20 +2096,20 @@ require_once __DIR__ . '/../includes/header.php';
 
 
                       <!-- ══ COMPOSITE BLOCK BUILDER ══════════════════════════════════════ -->
-                      <div id="cbs-panel" style="margin-bottom:1.25rem;">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.625rem;">
-                          <div style="font-size:0.7rem; font-weight:700; color:#4F46E5; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:0.4rem;">
-                            <span style="background:linear-gradient(135deg,#4F46E5,#7C3AED); color:#fff; border-radius:6px; padding:2px 7px; font-size:0.6rem;">STACK</span>
-                            Composite Block Builder
+                      <div id="cbs-panel" class="mb-5">
+                        <div class="flex items-center justify-between mb-3">
+                          <div class="flex items-center gap-[0.4rem] text-[0.7rem] font-bold text-indigo-600 uppercase tracking-[0.06em]">
+                            <span class="px-[7px] py-0.5 text-[0.6rem] rounded-md bg-gradient-to-br from-indigo-600 to-violet-600 text-white">STACK</span>
+                            FORM BUILDER
                           </div>
-                          <button type="button" id="cbs-add-btn" onclick="cbsShowTypePicker()" style="display:flex; align-items:center; gap:0.35rem; padding:0.3rem 0.85rem; font-size:0.7rem; font-weight:700; background:linear-gradient(135deg,#4F46E5,#7C3AED); color:#fff; border:none; border-radius:8px; cursor:pointer; box-shadow:0 2px 6px rgba(79,70,229,0.3); transition:all 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+                          <button type="button" id="cbs-add-btn" onclick="cbsShowTypePicker()" class="flex items-center gap-1.5 px-[0.85rem] py-[0.3rem] text-[0.7rem] font-bold text-white bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg cursor-pointer shadow-sm hover:-translate-y-0.5 transition-all">
                             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                             Add Element
                           </button>
                         </div>
 
                         <!-- Sub-Element Stack List -->
-                        <div id="cbs-stack" style="display:flex; flex-direction:column; gap:0.5rem; min-height:48px;">
+                        <div id="cbs-stack" class="flex flex-col gap-2 min-h-[48px]">
                           <!-- Elements injected by JS -->
                         </div>
 
