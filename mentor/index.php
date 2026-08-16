@@ -701,9 +701,9 @@ require_once __DIR__ . '/../includes/header.php';
       </div>
 
       <!-- Card -->
-      <div class="elysian-card p-8 shadow-2xl rounded-3xl">
-        <h1 class="text-2xl font-bold text-gray-900 text-center mb-1">Administrative Access</h1>
-        <p class="text-xs text-gray-500 text-center mb-6">
+      <div class="elysian-card p-4 sm:p-6 lg:p-8 shadow-2xl rounded-3xl">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 text-center mb-1">Administrative Access</h1>
+        <p class="text-xs sm:text-sm lg:text-base text-gray-500 text-center mb-6 leading-relaxed">
           Enter your admin authorization credentials to access cohorts.
         </p>
 
@@ -743,7 +743,7 @@ require_once __DIR__ . '/../includes/header.php';
   $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'students';
   ?>
 
-  <div class="flex flex-col lg:flex-row gap-6 w-full min-h-full py-2 px-1">
+  <div class="flex flex-col lg:flex-row gap-6 w-full min-h-full py-2 px-1 max-w-full overflow-x-hidden">
     <!-- Tab navigation (desktop/tablet-landscape only — on mobile the
          same tab links live in the global header's hamburger drawer,
          so there's a single menu instead of two) -->
@@ -832,7 +832,7 @@ require_once __DIR__ . '/../includes/header.php';
           <div class="lg:col-span-4 elysian-card overflow-hidden flex flex-col h-full min-h-0">
             <div class="p-4 border-b border-gray-200 bg-[#EEF8CD]/50 flex items-center justify-between">
               <div>
-                <h3 class="font-bold text-sm text-gray-900 font-display">Student Inbox</h3>
+                <h3 class="font-bold text-base sm:text-lg lg:text-xl text-gray-900 font-display">Student Inbox</h3>
                 <p class="text-[9px] text-gray-500 font-mono">Cohort: <?php echo count($students); ?> Total Users</p>
               </div>
               <a href="/mentor/index.php?tab=students&add_student=1" class="elysian-btn elysian-btn-brand py-1 px-3 text-[10px] font-bold">
@@ -1330,10 +1330,10 @@ require_once __DIR__ . '/../includes/header.php';
         $stmt_pay = $pdo->query("SELECT p.*, s.name as student_name FROM `payments` p JOIN `students` s ON p.student_permanent_id = s.permanent_id ORDER BY p.submitted_at DESC");
         $payments = $stmt_pay->fetchAll();
         ?>
-        <div class="elysian-card p-6 shadow-2xl h-full lg:h-[calc(100vh-10rem)] flex flex-col overflow-hidden">
+        <div class="elysian-card p-4 sm:p-6 lg:p-8 shadow-2xl h-full lg:h-[calc(100vh-10rem)] flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-200 mb-5 flex-shrink-0">
             <div>
-              <h2 class="text-lg font-bold font-display text-gray-900">Payment Reconciliation</h2>
+              <h2 class="text-base sm:text-lg lg:text-xl font-bold font-display text-gray-900">Payment Reconciliation</h2>
               <p class="text-[10px] text-gray-500 font-mono">Verify student transactions using Transaction ID (TTID)</p>
             </div>
           </div>
@@ -1417,7 +1417,7 @@ require_once __DIR__ . '/../includes/header.php';
           <div class="lg:col-span-5 elysian-card p-5 flex flex-col h-full min-h-0 overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
               <div>
-                <h3 class="font-bold text-sm text-gray-900 font-display">Program Database</h3>
+                <h3 class="font-bold text-base sm:text-lg lg:text-xl text-gray-900 font-display">Program Database</h3>
                 <p class="text-[10px] text-gray-500 font-mono">CRUD Actions (<?php echo count($all_programs); ?> Tracks)</p>
               </div>
               <a href="/mentor/index.php?tab=programs&add=1" class="elysian-btn elysian-btn-cyan py-1 px-3 text-xs">
@@ -1861,7 +1861,7 @@ require_once __DIR__ . '/../includes/header.php';
           <!-- ══ LEFT COLUMN: 4-Tier Tree Navigation Sidebar ══ -->
           <div class="elysian-card p-5 flex flex-col h-full min-h-0 overflow-y-auto custom-scrollbar">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-              <h3 class="font-bold text-sm text-gray-900 font-display flex items-center gap-2">
+              <h3 class="font-bold text-base sm:text-lg lg:text-xl text-gray-900 font-display flex items-center gap-2">
                 <span>📚</span> Content Tree Hierarchy
               </h3>
               <a href="/mentor/index.php?tab=pillars&selected_program_id=<?php echo urlencode($selected_prog_id); ?>&add_pillar=1" class="elysian-btn elysian-btn-brand py-1 px-3 text-[10px] font-bold">

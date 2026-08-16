@@ -652,7 +652,7 @@ require_once __DIR__ . '/includes/header.php';
 <!-- ══════════════════════════════════════════════════════════════
      MAIN WORKSTATION LAYOUT
 ══════════════════════════════════════════════════════════════ -->
-<div class="max-w-7xl mx-auto px-4 pb-24 w-full">
+<div class="max-w-7xl mx-auto px-4 pb-24 w-full overflow-x-hidden">
 
   <div class="flex flex-col lg:flex-row gap-6">
 
