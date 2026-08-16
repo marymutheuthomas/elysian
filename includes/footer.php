@@ -7,24 +7,24 @@
   <footer class="no-print flex-shrink-0" id="app-footer"
           style="border-top:1px solid var(--color-border);
                  background-color:var(--color-surface);
-                 padding: 0 1.5rem;
-                 height: 44px;
+                 padding: 0.75rem 1.5rem;
+                 min-height: 44px;
                  display:flex;
                  align-items:center;
                  flex-shrink:0;
                  transition:background-color 0.25s ease, border-color 0.25s ease;">
-    <div class="max-w-screen-xl mx-auto w-full flex items-center justify-between gap-4">
-      <span style="font-size:0.7rem; color:var(--color-text-muted);">
+    <div class="max-w-screen-xl mx-auto w-full flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-4">
+      <span style="font-size:0.7rem; color:var(--color-text-muted);" class="text-center sm:text-left">
         &copy; <?php echo date('Y'); ?> Elysian Success. All rights reserved.
       </span>
-      <div class="flex items-center gap-4" style="font-size:0.7rem; color:var(--color-text-muted);">
-        <a href="/privacy.php" style="color:inherit;" onmouseover="this.style.color='var(--color-gold)'"
+      <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5" style="font-size:0.7rem; color:var(--color-text-muted);">
+        <a href="/privacy.php" style="color:inherit; padding:0.25rem 0;" onmouseover="this.style.color='var(--color-gold)'"
            onmouseout="this.style.color='var(--color-text-muted)'">Privacy Policy</a>
-        <a href="/terms.php" style="color:inherit;" onmouseover="this.style.color='var(--color-gold)'"
+        <a href="/terms.php" style="color:inherit; padding:0.25rem 0;" onmouseover="this.style.color='var(--color-gold)'"
            onmouseout="this.style.color='var(--color-text-muted)'">Terms of Service</a>
-        <a href="/support.php" style="color:inherit;" onmouseover="this.style.color='var(--color-cyan)'"
+        <a href="/support.php" style="color:inherit; padding:0.25rem 0;" onmouseover="this.style.color='var(--color-cyan)'"
            onmouseout="this.style.color='var(--color-text-muted)'">Support</a>
-        <a href="/mentor/index.php" style="color:inherit; opacity:0.55;" onmouseover="this.style.opacity='1'"
+        <a href="/mentor/index.php" style="color:inherit; opacity:0.55; padding:0.25rem 0;" onmouseover="this.style.opacity='1'"
            onmouseout="this.style.opacity='0.55'">Staff Access</a>
       </div>
     </div>
