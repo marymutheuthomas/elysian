@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $uin = isset($_POST['uin']) ? trim(strtoupper($_POST['uin'])) : '';
 
     if (empty($uin)) {
-        $error_msg = 'Please enter your Permanent ID (UIN).';
+        $error_msg = 'Please enter your Student Code.';
     } else {
         $stmt = $pdo->prepare("SELECT * FROM `students` WHERE `permanent_id` = ?");
         $stmt->execute([$uin]);
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         } else {
-            $error_msg = 'UIN not found. Please register or check your spelling.';
+            $error_msg = "We couldn't find that Student Code. Please register or check your spelling.";
         }
     }
 }
@@ -108,9 +108,9 @@ require_once __DIR__ . '/includes/header.php';
   <div class="w-full max-w-md">
     <!-- Card -->
     <div class="elysian-card p-8 bg-white/80 glass shadow-xl rounded-3xl">
-      <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">Welcome Back</h1>
+      <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">Great to see you again!</h1>
       <p class="text-xs text-slate-400 text-center mb-6">
-        Enter your Permanent ID (UIN) to resume your path.
+        Enter your personal Student Code to pick up right where you left off.
       </p>
 
       <?php if (!empty($error_msg)): ?>
@@ -124,22 +124,26 @@ require_once __DIR__ . '/includes/header.php';
 
       <form method="POST" action="index.php" class="space-y-4">
         <div class="flex flex-col gap-1.5">
-          <label class="elysian-label">Permanent ID (UIN)</label>
+          <label class="elysian-label">Your Student Code</label>
           <input
             type="text"
             name="uin"
-            placeholder="ES-XXXX-X-XXXX"
+            placeholder="e.g., ES-1234-A-5678"
             class="elysian-input text-center font-mono tracking-widest uppercase"
             required
           />
         </div>
 
         <button type="submit" class="w-full elysian-btn elysian-btn-gold mt-2 py-3.5">
-          Resume Diagnostic
+          Pick Up Where I Left Off
         </button>
       </form>
 
-      <div class="mt-6 pt-5 border-t border-slate-100 text-center text-xs">
+      <div class="mt-4 text-center text-xs text-slate-400">
+        Lost your code? Ask your mentor for help.
+      </div>
+
+      <div class="mt-4 pt-5 border-t border-slate-100 text-center text-xs">
         <span class="text-slate-400">First time here? </span>
         <a href="/register.php" class="text-amber-500 font-bold hover:underline">
           Create an account
