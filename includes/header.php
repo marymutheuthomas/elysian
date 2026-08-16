@@ -677,8 +677,8 @@ $html_class = '';
         </span>
       </a>
 
-      <!-- Right nav cluster -->
-      <nav class="flex items-center gap-2 sm:gap-3" aria-label="Header navigation">
+      <!-- Right nav cluster (desktop) -->
+      <nav class="hidden md:flex items-center gap-2 sm:gap-3" aria-label="Header navigation">
 
         <?php if (isset($_SESSION['student_id'])): ?>
           <!-- Logged-in student -->
@@ -713,8 +713,67 @@ $html_class = '';
              style="color:var(--color-gold);">Student Area</a>
         <?php endif; ?>
       </nav>
+
+      <!-- Hamburger toggle (mobile/tablet only) -->
+      <button type="button" id="mobile-menu-toggle" onclick="toggleMobileMenu()"
+              class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
+              aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+        <svg id="mobile-menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="mobile-menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
   </header>
+
+  <!-- Mobile menu drawer -->
+  <div id="mobile-menu" class="no-print hidden md:hidden bg-white border-t border-gray-200 shadow-lg">
+    <div class="px-4 py-3 space-y-1">
+      <?php if (isset($_SESSION['student_id'])): ?>
+        <div class="flex items-center gap-1.5 text-xs font-medium py-2.5 px-3 min-h-[44px]" style="color:var(--color-text-muted);">
+          <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/>
+          </svg>
+          <span style="color:var(--color-gold); font-weight:700; font-family:'Courier New',monospace; letter-spacing:0.05em;">
+            <?php echo htmlspecialchars($_SESSION['student_id']); ?>
+          </span>
+        </div>
+        <a href="/logout.php" class="flex items-center justify-center w-full min-h-[44px] py-2.5 px-3 rounded-lg text-sm font-bold text-white" style="background:#3F00FF;">
+          Logout
+        </a>
+
+      <?php elseif (isset($_SESSION['mentor_logged_in']) && $_SESSION['mentor_logged_in'] === true): ?>
+        <div class="flex items-center gap-1.5 text-xs font-semibold py-2.5 px-3 min-h-[44px]" style="color:var(--color-text-muted);">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+          <span style="color:var(--color-gold);">Elysian Mentor</span>
+        </div>
+        <a href="/logout.php" class="flex items-center justify-center w-full min-h-[44px] py-2.5 px-3 rounded-lg text-sm font-bold text-white" style="background:#3F00FF;">
+          Logout
+        </a>
+
+      <?php elseif ($is_mentor_route): ?>
+        <a href="/index.php" class="flex items-center w-full min-h-[44px] py-2.5 px-3 rounded-lg text-sm font-semibold"
+           style="color:var(--color-gold);">Student Area</a>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <script>
+    function toggleMobileMenu() {
+      var menu = document.getElementById('mobile-menu');
+      var iconOpen = document.getElementById('mobile-menu-icon-open');
+      var iconClose = document.getElementById('mobile-menu-icon-close');
+      var btn = document.getElementById('mobile-menu-toggle');
+      var wasHidden = menu.classList.contains('hidden');
+      menu.classList.toggle('hidden');
+      iconOpen.classList.toggle('hidden');
+      iconClose.classList.toggle('hidden');
+      btn.setAttribute('aria-expanded', wasHidden ? 'true' : 'false');
+    }
+  </script>
 
   <?php
   // ── Student progress stepper ──────────────────────────────────
