@@ -1432,8 +1432,8 @@ require_once __DIR__ . '/../includes/header.php';
         }
         $is_adding = isset($_GET['add']) && $_GET['add'] == 1;
         ?>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full lg:h-[calc(100vh-10rem)] min-h-[600px]">
+
           <!-- Program registry listing -->
           <div class="lg:col-span-5 elysian-card p-5 flex flex-col h-full min-h-0 overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
