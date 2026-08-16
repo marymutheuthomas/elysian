@@ -1649,7 +1649,7 @@ require_once __DIR__ . '/../includes/header.php';
             top: 0;
             right: 0;
             height: 100vh;
-            width: 400px;
+            width: 640px;
             max-width: 90vw;
             z-index: 60;
             box-shadow: -12px 0 32px rgba(15, 23, 42, 0.18);
