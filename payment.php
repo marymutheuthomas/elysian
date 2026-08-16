@@ -155,12 +155,12 @@ require_once __DIR__ . '/includes/header.php';
               type="text"
               name="ttid"
               placeholder="Enter wire/payment reference number"
-              class="elysian-input text-center font-mono tracking-wide"
+              class="elysian-input text-center font-mono tracking-wide focus:outline-none focus:ring-2 focus:ring-[#3F00FF] focus:border-[#3F00FF]"
               required
             />
           </div>
 
-          <button type="submit" class="w-full elysian-btn elysian-btn-gold mt-2 py-3.5">
+          <button type="submit" class="group w-full inline-flex items-center justify-center gap-2 mt-2 py-3.5 rounded-xl font-bold text-white bg-[#3F00FF] hover:bg-[#2E00B3] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
             Submit Verification
           </button>
         </form>
