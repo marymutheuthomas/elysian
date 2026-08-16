@@ -826,10 +826,16 @@ require_once __DIR__ . '/../includes/header.php';
                 }
             }
         }
+        // On mobile/tablet, showing the list AND the detail panel stacked at
+        // once means a long scroll past the whole list to reach it. So below
+        // lg: we show one or the other: the list by default, or — once a
+        // student is selected/being added/edited — just the detail panel
+        // (with a Back link to return to the list).
+        $mobile_detail_active = $sel_stud || isset($_GET['add_student']) || isset($_GET['edit_student_id']);
         ?>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full h-full lg:h-[calc(100vh-10rem)] min-h-[600px]">
           <!-- Student list -->
-          <div class="lg:col-span-4 elysian-card overflow-hidden flex flex-col h-full min-h-0">
+          <div class="<?php echo $mobile_detail_active ? 'hidden lg:flex' : 'flex'; ?> lg:col-span-4 elysian-card overflow-hidden flex-col h-full min-h-0">
             <div class="p-4 border-b border-gray-200 bg-[#EEF8CD]/50 flex items-center justify-between">
               <div>
                 <h3 class="font-bold text-base sm:text-lg lg:text-xl text-gray-900 font-display">Student Inbox</h3>
@@ -868,7 +874,11 @@ require_once __DIR__ . '/../includes/header.php';
           </div>
 
           <!-- Student details and chat -->
-          <div class="lg:col-span-8 h-full min-h-0 flex flex-col">
+          <div class="<?php echo $mobile_detail_active ? 'flex' : 'hidden lg:flex'; ?> lg:col-span-8 h-full min-h-0 flex-col">
+            <a href="/mentor/index.php?tab=students" class="lg:hidden inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 mb-3 flex-shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              Back to Registry
+            </a>
             <?php 
             $add_student = isset($_GET['add_student']) ? 1 : 0;
             $edit_student_id = isset($_GET['edit_student_id']) ? $_GET['edit_student_id'] : '';
