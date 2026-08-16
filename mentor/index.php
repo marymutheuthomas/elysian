@@ -1353,7 +1353,7 @@ require_once __DIR__ . '/../includes/header.php';
         $stmt_pay = $pdo->query("SELECT p.*, s.name as student_name FROM `payments` p JOIN `students` s ON p.student_permanent_id = s.permanent_id ORDER BY p.submitted_at DESC");
         $payments = $stmt_pay->fetchAll();
         ?>
-        <div class="elysian-card p-6 shadow-2xl max-h-full flex flex-col overflow-hidden">
+        <div class="elysian-card p-6 shadow-2xl h-full lg:h-[calc(100vh-10rem)] flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-200 mb-5 flex-shrink-0">
             <div>
               <h2 class="text-lg font-bold font-display text-gray-900">Payment Reconciliation</h2>
