@@ -156,10 +156,10 @@ require_once __DIR__ . '/includes/header.php';
 
           <a
             href="/programs.php"
-            class="w-full elysian-btn elysian-btn-gold py-3.5 flex items-center justify-center gap-2"
+            class="group w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white bg-[#3F00FF] hover:bg-[#2E00B3] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
           >
             Proceed to Path Selection
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </a>
