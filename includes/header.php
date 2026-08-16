@@ -636,6 +636,18 @@ $html_class = '';
       background-color: var(--brand-hover);
       box-shadow: 0 4px 14px rgba(79,70,229,0.35);
     }
+
+    /* ── Mobile & Touch Optimizations ────────────────────────────
+       Applies to every page via the shared .elysian-input/.ely-input/
+       .elysian-btn component classes — no per-page overrides needed. */
+    @media (max-width: 639px) {
+      .elysian-input, .ely-input, select.elysian-input, textarea.elysian-input {
+        font-size: 1rem; /* 16px — prevents iOS Safari auto-zoom on focus */
+      }
+      .elysian-btn {
+        min-height: 44px; /* WCAG/iOS minimum touch target */
+      }
+    }
   </style>
 </head>
 

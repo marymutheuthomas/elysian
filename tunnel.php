@@ -834,7 +834,7 @@ require_once __DIR__ . '/includes/header.php';
                           <?php for ($r=1; $r<=5; $r++): ?>
                             <label class="cursor-pointer">
                               <input type="radio" name="composite_ans[<?php echo $elem_id; ?>]" value="<?php echo $r; ?>" <?php echo ((string)$sub_ans === (string)$r) ? 'checked' : ''; ?> class="sr-only peer">
-                              <div class="p-2.5 rounded-lg border border-subtle bg-white dark:bg-slate-800 text-center text-xs font-bold text-main peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all"><?php echo $r; ?></div>
+                              <div class="min-h-[44px] flex items-center justify-center rounded-lg border border-subtle bg-white dark:bg-slate-800 text-center text-xs font-bold text-main peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all"><?php echo $r; ?></div>
                             </label>
                           <?php endfor; ?>
                         </div>
@@ -1490,8 +1490,8 @@ require_once __DIR__ . '/includes/header.php';
       </button>
     <?php endif; ?>
 
-    <!-- Auto-save draft status indicator -->
-    <div id="ely-save-status" class="ely-badge-status text-[11px] font-semibold text-muted flex items-center gap-1.5 font-mono">
+    <!-- Auto-save draft status indicator (hidden on the smallest screens to avoid crowding the Back/Save buttons) -->
+    <div id="ely-save-status" class="ely-badge-status text-[11px] font-semibold text-muted hidden sm:flex items-center gap-1.5 font-mono">
       <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
       <span>Draft Saved</span>
     </div>

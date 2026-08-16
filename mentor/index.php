@@ -1365,6 +1365,7 @@ require_once __DIR__ . '/../includes/header.php';
             <?php if (count($payments) === 0): ?>
               <div class="text-center py-12 text-gray-400 text-xs">No transaction submissions recorded yet.</div>
             <?php else: ?>
+              <div class="overflow-x-auto max-w-full">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr class="border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-wider sticky top-0 bg-[#EEF8CD] z-10">
@@ -1411,6 +1412,7 @@ require_once __DIR__ . '/../includes/header.php';
                   <?php endforeach; ?>
                 </tbody>
               </table>
+              </div>
             <?php endif; ?>
           </div>
         </div>
