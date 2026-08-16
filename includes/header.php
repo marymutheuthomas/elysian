@@ -79,7 +79,7 @@ $html_class = '';
       /* Logo Core Colors */
       --color-brand-primary: #3F00FF;
       --color-brand-hover: #2E00B3;
-      --color-brand-gold: #FFD700;
+      --color-brand-gold: #A38B00;
       --color-brand-gold-dark: #B88600;
 
       /* Soft Tints for Light Cards */
@@ -99,7 +99,7 @@ $html_class = '';
       --color-blue:         var(--color-brand-primary);
       --color-gold:         var(--color-brand-gold);
       --color-gold-dark:    var(--color-brand-gold-dark);
-      --color-gold-glow:    rgba(255, 215, 0, 0.35);
+      --color-gold-glow:    rgba(163, 139, 0, 0.35);
       --color-cyan:         var(--color-brand-primary);
       --color-cyan-dark:    var(--color-brand-hover);
       --color-cyan-glow:    rgba(63, 0, 255, 0.20);
