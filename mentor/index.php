@@ -747,44 +747,27 @@ require_once __DIR__ . '/../includes/header.php';
     <!-- Tab navigation -->
     <aside class="w-full lg:w-64 flex-shrink-0">
       <div class="elysian-card p-5 shadow-md sticky top-4">
-        <!-- Mobile/Tablet Only Header block inside Sidebar -->
+        <!-- Mobile/Tablet Only Header block inside Sidebar
+             (identity/logout already live in the global header above —
+             this row is just the toggle for the tab menu below) -->
         <div class="lg:hidden flex items-center justify-between border-b border-gray-200 pb-4 mb-4 gap-3">
-          <!-- Mini Logo -->
-          <a href="/index.php" class="flex items-center gap-2 flex-shrink-0 group">
-            <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-[#1E293B]">
-              <span class="text-white font-black text-xs font-display">E</span>
-            </div>
-            <span class="font-black text-sm tracking-tight font-display text-gray-900">
-              ELYSIAN<span class="text-[#D97706]">SUCCESS</span>
-            </span>
-          </a>
-          <!-- Logout & Area -->
-          <div class="flex items-center gap-2">
-            <span class="text-[9px] font-bold text-[#D97706] bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-mono">
-              Mentor
-            </span>
-            <a href="/logout.php" class="text-red-500 hover:text-red-700 font-bold text-xs hover:underline flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
-            </a>
-            <!-- Hamburger toggle for the tab menu below -->
-            <button type="button" id="mentor-mobile-nav-toggle" onclick="toggleMentorMobileNav()"
-                    class="inline-flex items-center justify-center w-11 h-11 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
-                    aria-label="Toggle menu" aria-expanded="false" aria-controls="mentor-mobile-nav">
-              <svg id="mentor-mobile-nav-icon-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg id="mentor-mobile-nav-icon-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+          <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">
+            Menu Navigation
+          </span>
+          <button type="button" id="mentor-mobile-nav-toggle" onclick="toggleMentorMobileNav()"
+                  class="inline-flex items-center justify-center w-11 h-11 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
+                  aria-label="Toggle menu" aria-expanded="false" aria-controls="mentor-mobile-nav">
+            <svg id="mentor-mobile-nav-icon-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="mentor-mobile-nav-icon-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         <div id="mentor-mobile-nav" class="hidden lg:block">
-        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">
+        <span class="hidden lg:block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-4">
           Menu Navigation
         </span>
         <nav class="space-y-1.5">
