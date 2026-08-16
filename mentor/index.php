@@ -2764,9 +2764,8 @@ require_once __DIR__ . '/../includes/header.php';
                     if (card) {
                       card.innerHTML = `
                         <div style="border:1.5px solid #C7D2FE; background:#FFFFFF; border-radius:1rem; padding:1.25rem; box-shadow:0 4px 12px rgba(79,70,229,0.06);">
-                          <div class="flex items-center justify-between mb-3 border-b border-indigo-50 pb-2">
-                            <span class="pv-type-badge" style="background:#EEF2FF; color:#4F46E5;">COMPOSITE BLOCK (${cbsStack.length} elements)</span>
-                            <span class="text-[9px] font-mono text-indigo-400 uppercase font-bold">MULTI-ELEMENT CARD</span>
+                          <div class="mb-3 border-b border-indigo-50 pb-2">
+                            <span class="pv-type-badge" style="background:#EEF2FF; color:#4F46E5;">${cbsStack.length} element${cbsStack.length !== 1 ? 's' : ''}</span>
                           </div>
                           ${subHTML}
                         </div>`;
