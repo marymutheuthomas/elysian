@@ -793,7 +793,7 @@ require_once __DIR__ . '/includes/header.php';
                     <?php elseif ($elem_type === 'input_short_answer'): ?>
                       <div class="space-y-1.5">
                         <?php if (!empty($elem['label'])): ?>
-                          <label class="block text-sm font-bold text-main"><?php echo htmlspecialchars($elem['label']); ?><?php echo ($elem['required'] ?? true) ? ' <span class="text-red-500">*</span>' : ''; ?></label>
+                          <label class="block text-sm font-normal text-main"><?php echo htmlspecialchars($elem['label']); ?><?php echo ($elem['required'] ?? true) ? ' <span class="text-red-500">*</span>' : ''; ?></label>
                         <?php endif; ?>
                         <input type="text" name="composite_ans[<?php echo $elem_id; ?>]" class="ely-input" value="<?php echo htmlspecialchars($sub_ans); ?>" placeholder="<?php echo htmlspecialchars($elem['placeholder'] ?? 'Type answer...'); ?>" <?php echo ($elem['required'] ?? true) ? 'required' : ''; ?>>
                       </div>
@@ -801,7 +801,7 @@ require_once __DIR__ . '/includes/header.php';
                     <?php elseif ($elem_type === 'input_free_text' || $elem_type === 'goal_statement'): ?>
                       <div class="space-y-1.5">
                         <?php if (!empty($elem['label'])): ?>
-                          <label class="block text-sm font-bold text-main"><?php echo htmlspecialchars($elem['label']); ?><?php echo ($elem['required'] ?? true) ? ' <span class="text-red-500">*</span>' : ''; ?></label>
+                          <label class="block text-sm font-normal text-main"><?php echo htmlspecialchars($elem['label']); ?><?php echo ($elem['required'] ?? true) ? ' <span class="text-red-500">*</span>' : ''; ?></label>
                         <?php endif; ?>
                         <textarea name="composite_ans[<?php echo $elem_id; ?>]" rows="4" class="ely-input" placeholder="<?php echo htmlspecialchars($elem['placeholder'] ?? 'Type reflection...'); ?>" <?php echo ($elem['required'] ?? true) ? 'required' : ''; ?>><?php echo htmlspecialchars($sub_ans); ?></textarea>
                       </div>
@@ -813,7 +813,7 @@ require_once __DIR__ . '/includes/header.php';
                     ?>
                       <div class="space-y-1.5">
                         <?php if (!empty($elem['label'])): ?>
-                          <label class="block text-sm font-bold text-main"><?php echo htmlspecialchars($elem['label']); ?><?php echo ($elem['required'] ?? true) ? ' <span class="text-red-500">*</span>' : ''; ?></label>
+                          <label class="block text-sm font-normal text-main"><?php echo htmlspecialchars($elem['label']); ?><?php echo ($elem['required'] ?? true) ? ' <span class="text-red-500">*</span>' : ''; ?></label>
                         <?php endif; ?>
                         <select name="composite_ans[<?php echo $elem_id; ?>]" class="ely-input cursor-pointer" <?php echo ($elem['required'] ?? true) ? 'required' : ''; ?>>
                           <option value="">Select option...</option>
@@ -825,7 +825,7 @@ require_once __DIR__ . '/includes/header.php';
 
                     <?php elseif ($elem_type === 'rating_scale'): ?>
                       <div class="space-y-2 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-subtle">
-                        <label class="block text-sm font-bold text-main"><?php echo htmlspecialchars($elem['label'] ?? 'Rating Scale'); ?></label>
+                        <label class="block text-sm font-normal text-main"><?php echo htmlspecialchars($elem['label'] ?? 'Rating Scale'); ?></label>
                         <div class="flex justify-between text-[10px] font-bold text-muted">
                           <span>1 (<?php echo htmlspecialchars($elem['low_label'] ?? 'Low'); ?>)</span>
                           <span>5 (<?php echo htmlspecialchars($elem['high_label'] ?? 'High'); ?>)</span>
@@ -853,7 +853,7 @@ require_once __DIR__ . '/includes/header.php';
 
                     <?php elseif ($elem_type === 'trait_matrix'): ?>
                       <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-3">
-                        <p class="text-sm font-bold text-main">🎯 <?php echo htmlspecialchars($elem['question'] ?? 'Trait Scoring Question'); ?></p>
+                        <p class="text-sm font-normal text-main">🎯 <?php echo htmlspecialchars($elem['question'] ?? 'Trait Scoring Question'); ?></p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <label class="p-3 bg-white dark:bg-slate-900 border border-subtle rounded-xl cursor-pointer flex items-center justify-between hover:border-amber-500">
                             <div class="flex items-center gap-2">
