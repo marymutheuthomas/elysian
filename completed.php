@@ -171,6 +171,32 @@ if ($active_index < count($visibleComponents)) {
 $profileCode = strtoupper($student['profile_code']);
 $matchedProfile = isset($master_profiles[$profileCode]) ? $master_profiles[$profileCode] : null;
 
+// ── Only show archetype/profile content if this program actually included
+//    trait-scoring elements (legacy 'scoring'/'scoring_block' components, or
+//    a 'trait_matrix' element inside a component's content_schema). A
+//    student can end up with a leftover profile_code (e.g. a mentor typed
+//    one in manually, or they were reassigned from an MBTI program) even
+//    when their current program never asked an archetype question.
+$archetypeInProgram = false;
+foreach ($allComponents as $c) {
+    if (in_array($c['type'], ['scoring', 'scoring_block'], true)) {
+        $archetypeInProgram = true;
+        break;
+    }
+    if (!empty($c['content_schema'])) {
+        $schema = json_decode($c['content_schema'], true);
+        if (is_array($schema)) {
+            foreach ($schema as $elem) {
+                if (($elem['type'] ?? '') === 'trait_matrix') {
+                    $archetypeInProgram = true;
+                    break 2;
+                }
+            }
+        }
+    }
+}
+$showArchetype = $matchedProfile && $archetypeInProgram;
+
 // ── Separate components by type (Goal vs Reflections) ────────
 $goalComponents = [];
 $reflectionComponents = [];
@@ -228,6 +254,8 @@ require_once __DIR__ . '/includes/header.php';
       page-break-inside: avoid;
     }
     body { background: #FFFFFF !important; color: #000000 !important; }
+    .print-section { page-break-inside: avoid; }
+    .print-header { page-break-after: avoid; }
   }
 </style>
 
@@ -258,8 +286,8 @@ require_once __DIR__ . '/includes/header.php';
   <!-- Bento Grid Viewport -->
   <div class="bento-grid">
 
-    <!-- ── Tile 1: Hero Outcome (Span 8) ───────────────────────── -->
-    <div class="bento-tile col-span-12 lg:col-span-8 p-6 md:p-8 flex flex-col justify-between relative overflow-hidden">
+    <!-- ── Tile 1: Hero Outcome (Full Width) ───────────────────── -->
+    <div class="bento-tile col-span-12 p-6 md:p-8 flex flex-col justify-between relative overflow-hidden">
       <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600"></div>
 
       <div>
@@ -280,7 +308,7 @@ require_once __DIR__ . '/includes/header.php';
         </p>
       </div>
 
-      <?php if ($matchedProfile): ?>
+      <?php if ($showArchetype): ?>
         <div class="mt-6 pt-4 border-t border-subtle flex items-center justify-between flex-wrap gap-3">
           <div>
             <span class="text-[10px] font-bold uppercase tracking-widest text-muted block">Strategic Archetype</span>
@@ -293,35 +321,8 @@ require_once __DIR__ . '/includes/header.php';
       <?php endif; ?>
     </div>
 
-    <!-- ── Tile 2: Quick Summary Metrics (Span 4) ──────────────── -->
-    <div class="bento-tile col-span-12 lg:col-span-4 p-6 flex flex-col justify-between bg-indigo-50/40 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-900">
-      <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest block mb-3 font-mono">
-        Diagnostic Summary
-      </span>
-      <div class="space-y-3 flex-1 flex flex-col justify-center">
-        <div class="flex items-center justify-between p-3 rounded-xl bg-surface border border-subtle">
-          <span class="text-xs font-semibold text-main flex items-center gap-2">
-            <span>🏛️</span> Pillars Completed
-          </span>
-          <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400 font-mono"><?php echo count($pillars); ?></span>
-        </div>
-        <div class="flex items-center justify-between p-3 rounded-xl bg-surface border border-subtle">
-          <span class="text-xs font-semibold text-main flex items-center gap-2">
-            <span>📌</span> SMART Goals Mapped
-          </span>
-          <span class="text-lg font-bold text-amber-600 dark:text-amber-400 font-mono"><?php echo count($goalComponents); ?></span>
-        </div>
-        <div class="flex items-center justify-between p-3 rounded-xl bg-surface border border-subtle">
-          <span class="text-xs font-semibold text-main flex items-center gap-2">
-            <span>📝</span> Reflections Written
-          </span>
-          <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono"><?php echo count($reflectionComponents); ?></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Profile Details Card (if matched) ───────────────────── -->
-    <?php if ($matchedProfile): ?>
+    <!-- ── Profile Details Card (only when this program actually used archetype scoring) ───────────────────── -->
+    <?php if ($showArchetype): ?>
       <div class="bento-tile col-span-12 p-6 md:p-8">
         <span class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-1">
           Archetype Breakdown
@@ -536,7 +537,7 @@ function switchTab(tabId) {
 
   <div class="print-section bg-gray-50 p-4 border border-gray-200 rounded-lg mb-6">
     <h2 class="text-sm font-bold uppercase tracking-wider text-gray-700 mb-2">Program Assessment</h2>
-    <div class="grid grid-cols-2 gap-4 text-xs">
+    <div class="grid grid-cols-2 gap-4 text-xs mb-4">
       <div>
         <span class="text-gray-500 font-semibold block">Accelerator Path</span>
         <span class="font-bold text-gray-900"><?php echo htmlspecialchars($program['title']); ?></span>
@@ -546,9 +547,23 @@ function switchTab(tabId) {
         <span class="font-bold text-gray-900"><?php echo htmlspecialchars($program['duration']); ?></span>
       </div>
     </div>
+    <div class="grid grid-cols-3 gap-4 text-xs border-t border-gray-200 pt-3">
+      <div>
+        <span class="text-gray-500 font-semibold block">Pillars Completed</span>
+        <span class="font-bold text-gray-900"><?php echo count($pillars); ?></span>
+      </div>
+      <div>
+        <span class="text-gray-500 font-semibold block">SMART Goals Mapped</span>
+        <span class="font-bold text-gray-900"><?php echo count($goalComponents); ?></span>
+      </div>
+      <div>
+        <span class="text-gray-500 font-semibold block">Reflections Written</span>
+        <span class="font-bold text-gray-900"><?php echo count($reflectionComponents); ?></span>
+      </div>
+    </div>
   </div>
 
-  <?php if ($matchedProfile): ?>
+  <?php if ($showArchetype): ?>
     <div class="print-section mb-6">
       <h2 class="text-sm font-bold uppercase tracking-wider text-gray-700 border-b border-gray-300 pb-1.5 mb-3">
         Strategic Profile: <?php echo htmlspecialchars($matchedProfile['title']); ?> (<?php echo htmlspecialchars($profileCode); ?>)
@@ -576,6 +591,19 @@ function switchTab(tabId) {
           </ul>
         </div>
       </div>
+
+      <?php if (!empty($matchedProfile['suggested_goals'])): ?>
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+          <span class="text-gray-500 font-bold block mb-1.5 uppercase tracking-wide text-xs">Prescribed Strategic Actions</span>
+          <ul class="space-y-1 text-xs">
+            <?php foreach ($matchedProfile['suggested_goals'] as $gl): ?>
+              <li class="flex gap-1.5 items-start">
+                <span>•</span> <span><?php echo htmlspecialchars($gl); ?></span>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+      <?php endif; ?>
     </div>
   <?php endif; ?>
 
