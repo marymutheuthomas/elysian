@@ -1632,12 +1632,11 @@ require_once __DIR__ . '/../includes/header.php';
              AUTHORING SUITE STYLES
         ════════════════════════════════════════════════════════════ -->
         <style>
-          /* Authoring suite split layout */
-          .authoring-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; min-height: 100%; }
-          @media (max-width: 1100px) {
-            .authoring-split { grid-template-columns: 1fr; height: auto; }
-            .preview-panel { min-height: 500px; }
-          }
+          /* Authoring suite: Editor Panel and Preview Panel are mutually
+             exclusive (toggled via toggleComponentPreview()), so only one
+             ever occupies the row — single column, no permanent 50/50 split. */
+          .authoring-split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-height: 100%; }
+          .preview-panel { min-height: 500px; }
 
           /* Preview Panel — light mint-tinted chrome */
           .preview-panel {
@@ -2142,14 +2141,20 @@ require_once __DIR__ . '/../includes/header.php';
               <div class="authoring-split flex-1 min-h-0">
 
                 <!-- ── LEFT: Editor Panel ── -->
-                <div class="elysian-card flex flex-col overflow-hidden">
-                  <!-- Sticky Header (informational only — actions live in the bottom submit row) -->
-                  <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-md p-3.5 border-b border-gray-200 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                    <div>
-                      <span class="text-xs font-bold text-gray-900 font-display">Component Builder</span>
-                      <p class="text-[9px] text-gray-500 font-mono"><?php echo $edit_block ? 'Editing: ' . htmlspecialchars(substr($b_question, 0, 24)) . (strlen($b_question) > 24 ? '…' : '') : 'New Component'; ?></p>
+                <div id="editor-panel" class="elysian-card flex flex-col overflow-hidden">
+                  <!-- Sticky Header (info + on-demand preview toggle; actions live in the bottom submit row) -->
+                  <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-md p-3.5 border-b border-gray-200 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse flex-shrink-0"></span>
+                      <div class="min-w-0">
+                        <span class="text-xs font-bold text-gray-900 font-display">Component Builder</span>
+                        <p class="text-[9px] text-gray-500 font-mono truncate"><?php echo $edit_block ? 'Editing: ' . htmlspecialchars(substr($b_question, 0, 24)) . (strlen($b_question) > 24 ? '…' : '') : 'New Component'; ?></p>
+                      </div>
                     </div>
+                    <button type="button" onclick="toggleComponentPreview()"
+                       class="flex-shrink-0 text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded hover:bg-indigo-100 transition-colors inline-flex items-center gap-1 whitespace-nowrap">
+                      👁️ Preview
+                    </button>
                   </div>
 
                   <div class="flex-1 overflow-y-auto custom-scrollbar p-5">
@@ -2278,13 +2283,14 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
 
                 <!-- ── RIGHT: Student Preview Panel ── -->
-                <div class="preview-panel">
+                <div id="preview-panel-wrap" class="preview-panel hidden">
                   <div class="preview-header">
                     <span class="preview-dot" style="background:#ef4444;"></span>
                     <span class="preview-dot" style="background:#f59e0b;"></span>
                     <span class="preview-dot" style="background:#22c55e;"></span>
                     <span style="font-size:10px; color:#475569; font-weight:600; margin-left:0.5rem;">Student Mode Preview</span>
                     <span style="margin-left:auto; font-size:9px; font-weight:700; color:#C99700; background:rgba(201,151,0,0.1); padding:2px 8px; border-radius:99px;">LIVE</span>
+                    <button type="button" onclick="toggleComponentPreview()" style="font-size:9px; font-weight:700; color:#475569; background:none; border:none; cursor:pointer; padding:2px 6px;">✕ Close</button>
                   </div>
                   <div class="preview-body custom-scrollbar" id="as-preview-body">
                     <div class="pv-empty" id="as-preview-empty">
@@ -2302,6 +2308,12 @@ require_once __DIR__ . '/../includes/header.php';
               <!-- ── Authoring Suite JavaScript ── -->
               <script>
               (function() {
+                // ── Toggle: Editor Panel <-> Student Mode Preview (mutually exclusive) ──
+                window.toggleComponentPreview = function() {
+                  document.getElementById('editor-panel').classList.toggle('hidden');
+                  document.getElementById('preview-panel-wrap').classList.toggle('hidden');
+                };
+
                 // ── Debounce Helper Function (Step 3 Optimization) ───────────
                 function debounce(func, delay = 300) {
                   let timeoutId;
