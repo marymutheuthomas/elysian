@@ -107,15 +107,15 @@ require_once __DIR__ . '/includes/header.php';
 
   <div class="w-full max-w-md px-2 sm:px-0">
     <!-- Card -->
-    <div class="elysian-card p-6 sm:p-8 bg-white/80 glass shadow-xl rounded-3xl">
+    <div class="elysian-card p-4 sm:p-6 lg:p-8 bg-white/80 glass shadow-xl rounded-3xl">
       <div class="flex justify-center mb-4">
         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-full border border-emerald-200">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Session Active
         </span>
       </div>
 
-      <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 text-center mb-1">Ready to Level Up?</h1>
-      <p class="text-xs text-slate-400 text-center mb-6">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 text-center mb-1">Ready to Level Up?</h1>
+      <p class="text-xs sm:text-sm lg:text-base text-slate-400 text-center mb-6 leading-relaxed">
         Enter your Access Code to jump back into your session.
       </p>
 

@@ -172,7 +172,23 @@ $html_class = '';
       height: 100%;
       width: 100%;
       overflow-x: hidden;
+      /* Fluid base sizing — every rem-based Tailwind/utility size scales
+         down proportionally on smaller viewports. Mobile-first: 14px base,
+         15px from tablet (640px), 16px from desktop (1024px). */
+      font-size: 14px;
     }
+    @media (min-width: 640px) {
+      html { font-size: 15px; }
+    }
+    @media (min-width: 1024px) {
+      html { font-size: 16px; }
+    }
+
+    /* Headings without an explicit Tailwind text-size class fall back to
+       a fluid clamp() so long titles scale smoothly instead of wrapping
+       awkwardly on narrow screens. */
+    h1 { font-size: clamp(1.5rem, 4vw + 0.5rem, 2.5rem); line-height: 1.2; }
+    h2 { font-size: clamp(1.125rem, 2.5vw + 0.5rem, 1.75rem); line-height: 1.25; }
 
     /* Enforce light theme globally */
     body {
@@ -294,7 +310,8 @@ $html_class = '';
       font-size: 0.75rem;
       font-weight: 600;
       color: var(--color-text-muted);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
 
     /* ── Button Base ─────────────────────────────────────────── */
@@ -642,7 +659,10 @@ $html_class = '';
        .elysian-btn component classes — no per-page overrides needed. */
     @media (max-width: 639px) {
       .elysian-input, .ely-input, select.elysian-input, textarea.elysian-input {
-        font-size: 1rem; /* 16px — prevents iOS Safari auto-zoom on focus */
+        /* Absolute px, not rem — must stay exactly 16px regardless of the
+           fluid root font-size above, or iOS Safari auto-zooms on focus. */
+        font-size: 16px;
+        padding: 0.625rem 0.875rem; /* py-2.5 px-3.5 equivalent */
       }
       .elysian-btn {
         min-height: 44px; /* WCAG/iOS minimum touch target */
@@ -716,7 +736,7 @@ $html_class = '';
 
       <!-- Hamburger toggle (mobile/tablet only) -->
       <button type="button" id="mobile-menu-toggle" onclick="toggleMobileMenu()"
-              class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
+              class="md:hidden inline-flex items-center justify-center w-[44px] h-[44px] rounded-lg text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
               aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
         <svg id="mobile-menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

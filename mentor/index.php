@@ -3237,15 +3237,15 @@ require_once __DIR__ . '/../includes/header.php';
         $is_saved = isset($_GET['saved']) && $_GET['saved'] === '1';
         ?>
 
-        <div class="elysian-card p-6 flex flex-col h-full lg:h-[calc(100vh-10rem)] min-h-0 text-gray-800 overflow-y-auto custom-scrollbar">
-          <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-6">
-            <div>
+        <div class="elysian-card p-4 sm:p-6 lg:p-8 flex flex-col h-full lg:h-[calc(100vh-10rem)] min-h-0 text-gray-800 overflow-y-auto custom-scrollbar overflow-x-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-gray-200 mb-6">
+            <div class="min-w-0">
               <span class="text-[9px] font-bold text-[#D97706] uppercase tracking-widest block font-mono">16-Archetype Outcome Manager</span>
-              <h2 class="text-xl font-bold text-gray-900 font-display mt-0.5">Custom Score Card Authoring</h2>
-              <p class="text-xs text-gray-500 mt-1">Author customized titles, taglines, strengths, growth areas, and SMART goals for every MBTI outcome combination.</p>
+              <h2 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 font-display mt-0.5">Custom Score Card Authoring</h2>
+              <p class="text-xs sm:text-sm lg:text-base text-gray-500 mt-1 leading-relaxed">Author customized titles, taglines, strengths, growth areas, and SMART goals for every MBTI outcome combination.</p>
             </div>
-            <div>
-              <span class="px-3 py-1.5 bg-[#FFC5AA]/40 text-gray-900 border border-[#FFC5AA] rounded-full font-mono text-xs font-bold">
+            <div class="flex-shrink-0">
+              <span class="inline-block px-3 py-1.5 bg-[#FFC5AA]/40 text-gray-900 border border-[#FFC5AA] rounded-full font-mono text-xs font-bold">
                 Active Code: <?php echo htmlspecialchars($sel_code); ?>
               </span>
             </div>
@@ -3316,7 +3316,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <div class="flex justify-end pt-2">
-              <button type="submit" class="elysian-btn elysian-btn-gold px-8 py-3 text-xs font-bold shadow-lg flex items-center gap-2">
+              <button type="submit" class="w-full sm:w-auto justify-center elysian-btn elysian-btn-gold px-8 py-3 text-xs font-bold shadow-lg flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 Save Archetype Outcome Card
               </button>

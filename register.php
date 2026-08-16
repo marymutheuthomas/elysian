@@ -64,11 +64,11 @@ require_once __DIR__ . '/includes/header.php';
 
   <div class="w-full max-w-md px-2 sm:px-0">
     <!-- Card -->
-    <div class="elysian-card p-6 sm:p-8 bg-white/80 glass shadow-xl rounded-3xl overflow-hidden transition-all duration-300">
+    <div class="elysian-card p-4 sm:p-6 lg:p-8 bg-white/80 glass shadow-xl rounded-3xl overflow-hidden transition-all duration-300">
 
       <?php if (!$generated_uin): ?>
-        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800 text-center mb-1 leading-tight">Unlock Your Growth Journey ✨</h1>
-        <p class="text-xs text-slate-400 text-center mb-6">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 text-center mb-1 leading-tight">Unlock Your Growth Journey ✨</h1>
+        <p class="text-xs sm:text-sm lg:text-base text-slate-400 text-center mb-6 leading-relaxed">
           Join Elysian today to claim your personal Access Pass and start leveling up.
         </p>
 

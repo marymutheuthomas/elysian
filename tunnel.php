@@ -735,11 +735,11 @@ require_once __DIR__ . '/includes/header.php';
           $heading_lvl = $cfg_data['heading_level'] ?? 'h3';
 
           $card_wrapper_cls = match($block_style) {
-              'callout' => 'bg-sky-50/70 dark:bg-sky-950/30 border-l-4 border-l-sky-500 border border-sky-100 dark:border-sky-900/40 rounded-2xl p-6 md:p-8 shadow-sm',
-              'warning' => 'bg-amber-50/70 dark:bg-amber-950/30 border-l-4 border-l-amber-500 border border-amber-100 dark:border-amber-900/40 rounded-2xl p-6 md:p-8 shadow-sm',
-              'action'  => 'bg-emerald-50/70 dark:bg-emerald-950/30 border-2 border-emerald-500 rounded-2xl p-6 md:p-8 shadow-md',
-              'minimal' => 'bg-transparent border-0 p-2 md:p-4',
-              default   => 'ely-card p-6 md:p-8'
+              'callout' => 'bg-sky-50/70 dark:bg-sky-950/30 border-l-4 border-l-sky-500 border border-sky-100 dark:border-sky-900/40 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm',
+              'warning' => 'bg-amber-50/70 dark:bg-amber-950/30 border-l-4 border-l-amber-500 border border-amber-100 dark:border-amber-900/40 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm',
+              'action'  => 'bg-emerald-50/70 dark:bg-emerald-950/30 border-2 border-emerald-500 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-md',
+              'minimal' => 'bg-transparent border-0 p-2 sm:p-4',
+              default   => 'ely-card p-4 sm:p-6 lg:p-8'
           };
           ?>
           <div class="<?php echo $card_wrapper_cls; ?>">
@@ -944,19 +944,19 @@ require_once __DIR__ . '/includes/header.php';
                   <div class="mb-5">
                     <?php if (!empty($currentComp['question'])): ?>
                       <?php if ($heading_lvl === 'h1'): ?>
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-main font-display mb-2.5 leading-tight tracking-tight">
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-main font-display mb-2.5 leading-tight tracking-tight">
                           <?php echo htmlspecialchars($currentComp['question']); ?>
                         </h1>
                       <?php elseif ($heading_lvl === 'h2'): ?>
-                        <h2 class="text-2xl md:text-3xl font-bold text-main font-display mb-2.5 leading-snug tracking-tight">
+                        <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-main font-display mb-2.5 leading-snug tracking-tight">
                           <?php echo htmlspecialchars($currentComp['question']); ?>
                         </h2>
                       <?php elseif ($heading_lvl === 'h4'): ?>
-                        <h4 class="text-lg md:text-xl font-semibold text-main font-display mb-2">
+                        <h4 class="text-base sm:text-lg lg:text-xl font-semibold text-main font-display mb-2">
                           <?php echo htmlspecialchars($currentComp['question']); ?>
                         </h4>
                       <?php else: ?>
-                        <h3 class="text-xl md:text-2xl font-bold text-main font-display mb-2.5 leading-snug">
+                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-main font-display mb-2.5 leading-snug">
                           <?php echo htmlspecialchars($currentComp['question']); ?>
                         </h3>
                       <?php endif; ?>
