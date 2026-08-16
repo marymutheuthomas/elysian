@@ -1382,7 +1382,7 @@ require_once __DIR__ . '/includes/header.php';
     <!-- Floating toggle for the mentor chat drawer — hidden by default so
          students can focus on the course content; pops open on demand. -->
     <button type="button" onclick="toggleTunnelChat()" id="tunnel-chat-toggle-btn" style="padding:0;"
-            class="fixed bottom-6 right-6 z-[56] elysian-btn elysian-btn-brand shadow-lg rounded-full w-14 h-14 flex items-center justify-center text-lg" aria-label="Chat with your mentor">
+            class="fixed bottom-24 right-6 z-[56] elysian-btn elysian-btn-brand shadow-lg rounded-full w-14 h-14 flex items-center justify-center text-lg" aria-label="Chat with your mentor">
       💬
       <span id="tunnel-chat-count"
             class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center <?php echo count($chat_messages) === 0 ? 'hidden' : ''; ?>">
