@@ -658,14 +658,14 @@ require_once __DIR__ . '/includes/header.php';
 
 
     <!-- 1. Left Pillar Navigation Sidebar -->
-    <aside class="w-full lg:w-64 flex-shrink-0">
-      <div class="ely-card p-4 sticky top-20">
-        <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-1 truncate">
+    <aside class="w-full lg:w-80 flex-shrink-0">
+      <div class="ely-card p-5 sticky top-20">
+        <h3 class="text-sm font-bold text-muted uppercase tracking-widest mb-1 truncate">
           <?php echo htmlspecialchars($program['title']); ?>
         </h3>
-        <p class="text-[10px] text-muted mb-4 font-mono">Step <?php echo $active_index + 1; ?> of <?php echo count($visibleComponents); ?></p>
-        
-        <nav class="space-y-1.5">
+        <p class="text-xs text-muted mb-4 font-mono">Step <?php echo $active_index + 1; ?> of <?php echo count($visibleComponents); ?></p>
+
+        <nav class="space-y-2">
           <?php foreach ($pillars as $p_idx => $pil):
             $stats      = $pillar_stats[$pil['id']] ?? ['total' => 0, 'done' => 0];
             $is_active  = ($currentComp && $currentComp['_pillar_id'] === $pil['id']);
@@ -679,22 +679,30 @@ require_once __DIR__ . '/includes/header.php';
                 ? ($pillar_first_idx !== null && !$is_active)
                 : ($pillar_first_idx !== null && $pillar_first_idx < $active_index && !$is_active);
           ?>
-            <div class="flex items-start gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 <?php echo $is_active ? 'bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-bold' : 'text-main hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent'; ?>">
-              <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5 <?php echo $is_active ? 'bg-indigo-600 text-white' : ($is_done ? 'bg-emerald-500 text-white' : ($is_started ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-200 dark:bg-slate-700 text-muted')); ?>">
+            <div class="flex items-start gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-150 <?php echo $is_active ? 'bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-bold' : 'text-main hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent'; ?>">
+              <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 <?php echo $is_active ? 'bg-indigo-600 text-white' : ($is_done ? 'bg-emerald-500 text-white' : ($is_started ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-200 dark:bg-slate-700 text-muted')); ?>">
                 <?php if ($is_done): ?>✓<?php else: echo $p_idx + 1; endif; ?>
               </div>
               <div class="flex-1 min-w-0">
                 <?php if ($can_jump): ?>
-                  <a href="/tunnel.php?<?php echo $isReview ? 'view' : 'jump_to'; ?>=<?php echo $pillar_first_idx; ?>" class="block hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate">
+                  <a href="/tunnel.php?<?php echo $isReview ? 'view' : 'jump_to'; ?>=<?php echo $pillar_first_idx; ?>" class="block hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                     <?php echo htmlspecialchars($pil['title']); ?>
                   </a>
                 <?php else: ?>
-                  <span class="truncate block"><?php echo htmlspecialchars($pil['title']); ?></span>
+                  <span class="block"><?php echo htmlspecialchars($pil['title']); ?></span>
+                <?php endif; ?>
+                <?php if (!empty($pil['description'])): ?>
+                  <p class="text-xs font-normal text-muted mt-1 leading-relaxed line-clamp-2">
+                    <?php echo htmlspecialchars($pil['description']); ?>
+                  </p>
                 <?php endif; ?>
                 <?php if ($stats['total'] > 0): ?>
-                  <div class="w-full bg-slate-200 dark:bg-slate-700 h-1 rounded-full mt-1.5 overflow-hidden">
-                    <div class="<?php echo $is_done ? 'bg-emerald-500' : 'bg-indigo-500'; ?> h-full rounded-full transition-all duration-500"
-                         style="width:<?php echo round(($stats['done'] / $stats['total']) * 100); ?>%"></div>
+                  <div class="flex items-center gap-2 mt-2">
+                    <div class="flex-1 bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                      <div class="<?php echo $is_done ? 'bg-emerald-500' : 'bg-indigo-500'; ?> h-full rounded-full transition-all duration-500"
+                           style="width:<?php echo round(($stats['done'] / $stats['total']) * 100); ?>%"></div>
+                    </div>
+                    <span class="text-[10px] font-mono text-muted flex-shrink-0"><?php echo $stats['done']; ?>/<?php echo $stats['total']; ?></span>
                   </div>
                 <?php endif; ?>
               </div>
