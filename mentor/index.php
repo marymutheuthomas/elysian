@@ -3258,7 +3258,7 @@ require_once __DIR__ . '/../includes/header.php';
         $is_saved = isset($_GET['saved']) && $_GET['saved'] === '1';
         ?>
 
-        <div class="elysian-card p-6 flex flex-col h-full min-h-0 text-gray-800 overflow-y-auto custom-scrollbar">
+        <div class="elysian-card p-6 flex flex-col h-full lg:h-[calc(100vh-10rem)] min-h-0 text-gray-800 overflow-y-auto custom-scrollbar">
           <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-6">
             <div>
               <span class="text-[9px] font-bold text-[#D97706] uppercase tracking-widest block font-mono">16-Archetype Outcome Manager</span>
