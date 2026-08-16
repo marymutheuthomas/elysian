@@ -677,15 +677,10 @@ $html_class = '';
             Logout
           </a>
 
-        <?php else: ?>
-          <!-- Guest -->
-          <?php if ($is_mentor_route): ?>
-            <a href="/index.php" class="text-xs font-semibold hover:underline"
-               style="color:var(--color-gold);">Student Area</a>
-          <?php else: ?>
-            <a href="/mentor/index.php" class="text-xs font-semibold hover:underline"
-               style="color:var(--color-gold);">Mentor Area</a>
-          <?php endif; ?>
+        <?php elseif ($is_mentor_route): ?>
+          <!-- Guest on mentor route -->
+          <a href="/index.php" class="text-xs font-semibold hover:underline"
+             style="color:var(--color-gold);">Student Area</a>
         <?php endif; ?>
       </nav>
     </div>

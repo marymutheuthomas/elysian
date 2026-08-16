@@ -9,11 +9,27 @@ if (session_status() === PHP_SESSION_NONE) {
 $error_msg = '';
 $generated_uin = null;
 
-// Unique ID Generator matching ES-XXXXXX-N-XXXX format
-function generatePermanentID() {
-    $ts = strtoupper(base_convert(time(), 10, 36));
-    $rand = strtoupper(substr(md5(uniqid(rand(), true)), 0, 4));
-    return "ES-{$ts}-" . rand(1, 9) . "-{$rand}";
+// Student Code Generator — student's actual name + a random 4-digit PIN,
+// e.g. "JORDAN-4821". Personal and easy to remember, no format to decode.
+function generateStudentCode(PDO $pdo, string $name): string {
+    $slug = strtoupper(preg_replace('/[^A-Za-z]/', '', $name));
+    if ($slug === '') {
+        $slug = 'STUDENT';
+    }
+    $slug = substr($slug, 0, 12);
+
+    $checkStmt = $pdo->prepare("SELECT 1 FROM `students` WHERE `permanent_id` = ?");
+    for ($attempt = 0; $attempt < 20; $attempt++) {
+        $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $code = "{$slug}-{$pin}";
+        $checkStmt->execute([$code]);
+        if (!$checkStmt->fetchColumn()) {
+            return $code;
+        }
+    }
+
+    // Fallback in the vanishingly unlikely case all 10,000 PINs collide.
+    return $slug . '-' . substr((string) time(), -4);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -24,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_msg = 'Please fill out both Name and Email fields.';
     } else {
         try {
-            $uin = generatePermanentID();
+            $uin = generateStudentCode($pdo, $name);
             $stmt = $pdo->prepare("INSERT INTO `students` (`permanent_id`, `name`, `email`, `status`, `answers`) VALUES (?, ?, ?, 'program_selection', '{}')");
             $stmt->execute([$uin, $name, $email]);
 
@@ -53,7 +69,7 @@ require_once __DIR__ . '/includes/header.php';
       <?php if (!$generated_uin): ?>
         <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">Begin Diagnostic</h1>
         <p class="text-xs text-slate-400 text-center mb-6">
-          Register to start your strategic growth path and generate your secure UIN.
+          Register to start your strategic growth path and get your personal Student Code.
         </p>
 
         <?php if (!empty($error_msg)): ?>
@@ -86,7 +102,7 @@ require_once __DIR__ . '/includes/header.php';
           </div>
 
           <button type="submit" class="w-full elysian-btn elysian-btn-gold mt-2 py-3.5">
-            Generate UIN & Register
+            Create My Student Code
           </button>
         </form>
 
@@ -106,12 +122,12 @@ require_once __DIR__ . '/includes/header.php';
 
           <h1 class="text-xl font-bold text-slate-800 mb-1">Registration Complete</h1>
           <p class="text-xs text-slate-400 mb-6">
-            Your Permanent ID (UIN) has been securely generated. Save this ID. You will need it to log in again.
+            Your Student Code is ready. Save it — you'll need it to log in again.
           </p>
 
           <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-6 relative">
             <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-              Your Permanent ID
+              Your Student Code
             </span>
             <span id="uin-text" class="text-base font-mono font-bold text-slate-800 tracking-wider select-all">
               <?php echo htmlspecialchars($generated_uin); ?>
@@ -120,7 +136,7 @@ require_once __DIR__ . '/includes/header.php';
             <button
               onclick="copyUIN()"
               class="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-slate-200/60 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
-              title="Copy UIN"
+              title="Copy Student Code"
             >
               <span id="copy-status">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,13 +162,6 @@ require_once __DIR__ . '/includes/header.php';
           </a>
         </div>
       <?php endif; ?>
-    </div>
-
-    <!-- Mentor Portal Link -->
-    <div class="text-center mt-6">
-      <a href="/mentor/index.php" class="text-xs text-slate-400 font-medium hover:text-amber-500 transition-colors">
-        Access Mentor Portal
-      </a>
     </div>
   </div>
 </div>

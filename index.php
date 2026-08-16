@@ -128,7 +128,7 @@ require_once __DIR__ . '/includes/header.php';
           <input
             type="text"
             name="uin"
-            placeholder="e.g., ES-1234-A-5678"
+            placeholder="e.g., JORDAN-4821"
             class="elysian-input text-center font-mono tracking-widest uppercase"
             required
           />
