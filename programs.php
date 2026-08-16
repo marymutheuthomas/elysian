@@ -174,7 +174,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="pt-4 border-t border-slate-50 flex items-center justify-end">
               <button
                 type="submit"
-                class="elysian-btn elysian-btn-gold px-8 py-3 text-sm font-bold shadow-md shadow-amber-500/10 flex items-center gap-2"
+                class="group inline-flex items-center gap-2 px-8 py-3 text-sm font-bold rounded-xl text-white bg-[#3F00FF] hover:bg-[#2E00B3] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
               >
                 Proceed to Payment
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

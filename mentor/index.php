@@ -724,12 +724,12 @@ require_once __DIR__ . '/../includes/header.php';
               type="password"
               name="password"
               placeholder="••••••••"
-              class="elysian-input"
+              class="elysian-input focus:outline-none focus:ring-2 focus:ring-[#3F00FF] focus:border-[#3F00FF]"
               required
             />
           </div>
 
-          <button type="submit" class="w-full elysian-btn elysian-btn-gold mt-2 py-3.5">
+          <button type="submit" class="w-full inline-flex items-center justify-center gap-2 mt-2 py-3.5 rounded-xl font-bold text-white bg-[#3F00FF] hover:bg-[#2E00B3] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
             Access Dashboard
           </button>
         </form>
