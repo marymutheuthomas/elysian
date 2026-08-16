@@ -850,7 +850,7 @@ require_once __DIR__ . '/../includes/header.php';
             }
         }
         ?>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full min-h-[600px]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full h-full lg:h-[calc(100vh-10rem)] min-h-[600px]">
           <!-- Student list -->
           <div class="lg:col-span-4 elysian-card overflow-hidden flex flex-col h-full min-h-0">
             <div class="p-4 border-b border-gray-200 bg-[#EEF8CD]/50 flex items-center justify-between">
