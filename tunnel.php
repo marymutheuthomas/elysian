@@ -510,6 +510,30 @@ require_once __DIR__ . '/includes/header.php';
     background: rgba(15, 23, 42, 0.92);
     border-color: var(--border-subtle);
   }
+
+  /* Mentor chat drawer — hidden by default so students can focus on the
+     course; slides in from the right when the floating toggle is clicked. */
+  .tunnel-chat-drawer {
+    background: var(--surface-card);
+    border-radius: 1.25rem 0 0 1.25rem;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 360px;
+    max-width: 90vw;
+    z-index: 60;
+    box-shadow: -12px 0 32px rgba(15, 23, 42, 0.18);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.3s ease, visibility 0.3s ease;
+  }
+  .tunnel-chat-drawer.drawer-open { transform: translateX(0); visibility: visible; }
+  .tunnel-chat-backdrop {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.35); z-index: 55;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .tunnel-chat-backdrop.backdrop-open { opacity: 1; pointer-events: auto; }
 </style>
 
 <?php if ($show_pillar_complete && $completed_pillar): ?>
@@ -1364,15 +1388,33 @@ require_once __DIR__ . '/includes/header.php';
       <?php endif; ?>
     </main>
 
-    <!-- 3. Right Chat Support Sidebar -->
-    <aside class="w-full lg:w-80 flex-shrink-0">
-      <div class="ely-card h-[540px] flex flex-col sticky top-20">
-        <div class="p-4 bg-slate-900 text-white flex items-center gap-2.5 border-b border-slate-800">
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-          <div>
-            <h4 class="text-xs font-bold font-display uppercase tracking-wider">Elysian Advisor Chat</h4>
-            <p class="text-[9px] text-slate-400 font-medium">Direct line to your program mentor</p>
+    <!-- Floating toggle for the mentor chat drawer — hidden by default so
+         students can focus on the course content; pops open on demand. -->
+    <button type="button" onclick="toggleTunnelChat()" id="tunnel-chat-toggle-btn" style="padding:0;"
+            class="fixed bottom-6 right-6 z-[56] elysian-btn elysian-btn-brand shadow-lg rounded-full w-14 h-14 flex items-center justify-center text-lg" aria-label="Chat with your mentor">
+      💬
+      <span id="tunnel-chat-count"
+            class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center <?php echo count($chat_messages) === 0 ? 'hidden' : ''; ?>">
+        <?php echo count($chat_messages); ?>
+      </span>
+    </button>
+
+    <div id="tunnel-chat-backdrop" class="tunnel-chat-backdrop" onclick="toggleTunnelChat()"></div>
+
+    <!-- 3. Right Chat Support Drawer (hidden until opened) -->
+    <aside id="tunnel-chat-drawer" class="tunnel-chat-drawer">
+      <div class="h-full flex flex-col">
+        <div class="p-4 bg-slate-900 text-white flex items-center justify-between gap-2.5 border-b border-slate-800 flex-shrink-0">
+          <div class="flex items-center gap-2.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            <div>
+              <h4 class="text-xs font-bold font-display uppercase tracking-wider">Elysian Advisor Chat</h4>
+              <p class="text-[9px] text-slate-400 font-medium">Direct line to your program mentor</p>
+            </div>
           </div>
+          <button type="button" onclick="toggleTunnelChat()" class="text-slate-400 hover:text-white transition-colors flex-shrink-0" aria-label="Close chat">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
         <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-slate-50/50 dark:bg-slate-900/50">
           <?php if (count($chat_messages) === 0): ?>
@@ -1387,7 +1429,7 @@ require_once __DIR__ . '/includes/header.php';
             <?php endforeach; ?>
           <?php endif; ?>
         </div>
-        <form id="chat-form" method="POST" action="tunnel.php" class="p-3 border-t border-subtle flex gap-2 bg-surface">
+        <form id="chat-form" method="POST" action="tunnel.php" class="p-3 border-t border-subtle flex gap-2 bg-surface flex-shrink-0">
           <input type="hidden" name="send_chat" value="1">
           <input type="text" id="chat-input" name="chat_content"
                  placeholder="Ask a question..."
@@ -1644,6 +1686,13 @@ function pollMessages() {
     .then(data => {
       const c = document.getElementById('chat-messages-container');
       if (!c) return;
+
+      const countEl = document.getElementById('tunnel-chat-count');
+      if (countEl) {
+        countEl.textContent = data.length;
+        countEl.classList.toggle('hidden', data.length === 0);
+      }
+
       if (data.length === 0) {
         c.innerHTML = '<div class="text-center py-12 text-muted text-[11px] italic">No messages yet. Send a message to contact your mentor.</div>';
         return;
@@ -1677,7 +1726,18 @@ document.getElementById('chat-form')?.addEventListener('submit', function(e) {
     .catch(e => console.error('Chat send failed', e));
 });
 setInterval(pollMessages, 5000);
-document.addEventListener('DOMContentLoaded', () => { scrollChatToBottom(); });
+
+// Chat drawer is hidden by default so students can focus on the course;
+// opens on demand via the floating 💬 toggle button.
+function toggleTunnelChat() {
+  const drawer = document.getElementById('tunnel-chat-drawer');
+  const backdrop = document.getElementById('tunnel-chat-backdrop');
+  if (!drawer || !backdrop) return;
+  const opening = !drawer.classList.contains('drawer-open');
+  drawer.classList.toggle('drawer-open');
+  backdrop.classList.toggle('backdrop-open');
+  if (opening) scrollChatToBottom();
+}
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
