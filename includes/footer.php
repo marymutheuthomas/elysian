@@ -18,11 +18,11 @@
         &copy; <?php echo date('Y'); ?> Elysian Success. All rights reserved.
       </span>
       <div class="flex items-center gap-4" style="font-size:0.7rem; color:var(--color-text-muted);">
-        <a href="#" style="color:inherit;" onmouseover="this.style.color='var(--color-gold)'"
+        <a href="/privacy.php" style="color:inherit;" onmouseover="this.style.color='var(--color-gold)'"
            onmouseout="this.style.color='var(--color-text-muted)'">Privacy Policy</a>
-        <a href="#" style="color:inherit;" onmouseover="this.style.color='var(--color-gold)'"
+        <a href="/terms.php" style="color:inherit;" onmouseover="this.style.color='var(--color-gold)'"
            onmouseout="this.style.color='var(--color-text-muted)'">Terms of Service</a>
-        <a href="#" style="color:inherit;" onmouseover="this.style.color='var(--color-cyan)'"
+        <a href="/support.php" style="color:inherit;" onmouseover="this.style.color='var(--color-cyan)'"
            onmouseout="this.style.color='var(--color-text-muted)'">Support</a>
         <a href="/mentor/index.php" style="color:inherit; opacity:0.55;" onmouseover="this.style.opacity='1'"
            onmouseout="this.style.opacity='0.55'">Staff Access</a>

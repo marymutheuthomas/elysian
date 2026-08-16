@@ -149,7 +149,7 @@ require_once __DIR__ . '/includes/header.php';
       </form>
 
       <div class="mt-4 text-center text-xs text-slate-400">
-        Lost your code? Ask your mentor for help.
+        Lost your code? <a href="/support.php" class="text-[#3F00FF] font-semibold hover:underline">Get help</a>
       </div>
 
       <div class="mt-4 pt-5 border-t border-slate-100 text-center text-xs">
