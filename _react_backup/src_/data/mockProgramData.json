@@ -1,0 +1,74 @@
+{
+  "id": "elysian_accelerator_1",
+  "title": "Elysian Success Accelerator",
+  "description": "A premium roadmap for scaling operations, improving leadership depth, and unlocking exponential growth.",
+  "pillars": [
+    {
+      "id": "pillar_1",
+      "title": "Pillar 1: Vision & Strategic Positioning",
+      "description": "Establish your core direction, identify critical constraints, and set actionable growth milestones.",
+      "blocks": [
+        {
+          "id": "block_1",
+          "type": "free_text",
+          "question": "What is your primary professional vision for the next 12 months?",
+          "placeholder": "Detail your long-term goals, target revenue, or impact area...",
+          "required": true
+        },
+        {
+          "id": "block_2",
+          "type": "branching",
+          "question": "Identify the primary scaling constraint in your business today:",
+          "options": [
+            { "value": "client_acquisition", "label": "Client Acquisition & Branding" },
+            { "value": "operational_efficiency", "label": "Operational Systems & Delegation" },
+            { "value": "leadership_capacity", "label": "Leadership Alignment & Team Culture" }
+          ],
+          "required": true
+        },
+        {
+          "id": "block_3",
+          "type": "scoring",
+          "question": "Rate the strength of your standard operating procedures (SOPs):",
+          "options": [
+            { "value": "ad_hoc", "label": "Ad-hoc / Mostly undocumented", "score": 2, "hidden_code": "ESTP" },
+            { "value": "hybrid", "label": "Hybrid / Some departments documented", "score": 6, "hidden_code": "ISTJ" },
+            { "value": "mature", "label": "Mature / Fully documented and accessible", "score": 10, "hidden_code": "INTJ" }
+          ],
+          "required": true,
+          "showIf": {
+            "blockId": "block_2",
+            "operator": "equals",
+            "value": "operational_efficiency"
+          }
+        },
+        {
+          "id": "block_4",
+          "type": "free_text",
+          "question": "Describe the main channel you currently use to source high-value clients:",
+          "placeholder": "LinkedIn outreach, paid advertising, referrals, partners...",
+          "required": true,
+          "showIf": {
+            "blockId": "block_2",
+            "operator": "equals",
+            "value": "client_acquisition"
+          }
+        },
+        {
+          "id": "block_5",
+          "type": "goal",
+          "question": "State the key target metric (e.g. $ revenue, hire headcount) you want to achieve by Q4:",
+          "placeholder": "Example: Reach $100k MRR or hire 3 senior managers...",
+          "required": true
+        },
+        {
+          "id": "block_6",
+          "type": "result_reveal",
+          "question": "Your Elysian Success Profile",
+          "action_prompt": "These are suggested SMART goals based on your personality type. Rewrite them or add new ones that fit your life better.",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

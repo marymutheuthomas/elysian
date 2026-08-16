@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Elysian Trust Design Tokens ─────────────────────────────────────────── */
+@layer base {
+  :root {
+    --color-bg:        #F2F7FD;
+    --color-surface:   #FFFFFF;
+    --color-text:      #0F172A;
+    --color-gold:      #C99700;
+    --color-gold-dark: #A87D00;
+    --color-gold-glow: rgba(201,151,0,0.15);
+    --color-border:    #E2E8F0;
+    --color-muted:     rgba(15,23,42,0.45);
+    --color-mentor-bg: #0A0F1C;
+    --color-mentor-sidebar: #0F172A;
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.06);
+    --shadow-gold: 0 0 0 3px rgba(201,151,0,0.25);
+    --radius-card: 1.25rem;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+    color: var(--color-text);
+    line-height: 1.25;
+  }
+
+  input, textarea, select {
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: rgba(15,23,42,0.35);
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(15,23,42,0.2); }
+}
+
+/* ─── Component Utilities ──────────────────────────────────────────────────── */
+@layer components {
+  .elysian-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .elysian-input {
+    @apply w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A] bg-white;
+    @apply focus:outline-none focus:ring-2 focus:ring-[#C99700] focus:border-[#C99700] transition-all duration-200;
+  }
+
+  .elysian-btn {
+    @apply px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.97];
+  }
+
+  .elysian-btn-gold {
+    @apply elysian-btn bg-[#C99700] hover:bg-[#A87D00] text-white shadow-sm;
+  }
+
+  .elysian-btn-ghost {
+    @apply elysian-btn bg-transparent hover:bg-[#F2F7FD] text-[#0F172A] border border-[#E2E8F0];
+  }
+
+  .elysian-label {
+    @apply text-xs font-semibold uppercase tracking-wider text-[#0F172A] opacity-60;
+  }
+
+  .gold-badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#FFF8E1] text-[#A87D00] border border-[#F5D678]/40;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
+  }
+  .status-pending  { @apply status-pill bg-amber-50 text-amber-700 border border-amber-200; }
+  .status-active   { @apply status-pill bg-emerald-50 text-emerald-700 border border-emerald-200; }
+  .status-complete { @apply status-pill bg-blue-50 text-blue-700 border border-blue-200; }
+  .status-verified { @apply status-pill bg-emerald-50 text-emerald-700 border border-emerald-200; }
+  .status-rejected { @apply status-pill bg-red-50 text-red-700 border border-red-200; }
+
+  /* Mentor Dashboard */
+  .mentor-sidebar {
+    background: var(--color-mentor-sidebar);
+    color: rgba(255,255,255,0.85);
+  }
+
+  .mentor-sidebar-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .mentor-sidebar-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.9);
+  }
+
+  .mentor-sidebar-item.active {
+    background: rgba(201,151,0,0.15);
+    color: #C99700;
+  }
+
+  /* Bento Grid */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .bento-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 1024px) {
+    .bento-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .bento-grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* Chat bubble */
+  .chat-bubble-student {
+    @apply self-end rounded-2xl rounded-br-md px-4 py-2.5 text-sm max-w-[75%];
+    background: #0F172A;
+    color: #ffffff;
+  }
+  .chat-bubble-mentor {
+    @apply self-start rounded-2xl rounded-bl-md px-4 py-2.5 text-sm max-w-[75%];
+    background: #FFFFFF;
+    color: #0F172A;
+    border: 1px solid #E2E8F0;
+  }
+}
+
+/* ─── Animations ───────────────────────────────────────────────────────────── */
+@layer utilities {
+  .animate-card-enter { animation: cardEnter 0.35s ease-out forwards; }
+  .animate-card-exit  { animation: cardExit  0.28s ease-in  forwards; }
+  .animate-fade-in    { animation: fadeIn    0.4s  ease-out forwards; }
+  .animate-slide-up   { animation: slideUp   0.4s  ease-out forwards; }
+  .animate-pulse-gold { animation: pulseGold 2s ease-in-out infinite; }
+
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+}
+
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes cardExit {
+  from { opacity: 1; transform: translateY(0);    }
+  to   { opacity: 0; transform: translateY(-24px);}
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes pulseGold {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(201,151,0,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(201,151,0,0);   }
+}
+
+/* ─── Print / PDF Export ───────────────────────────────────────────────────── */
+@media print {
+  body { background: #fff !important; color: #000 !important; font-size: 11pt; }
+
+  .no-print { display: none !important; }
+
+  .print-page {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+
+  .print-header {
+    border-bottom: 2px solid #C99700;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+
+  .print-section {
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+
+  .print-answer-row {
+    border-bottom: 1px solid #eee;
+    padding: 8px 0;
+  }
+
+  @page {
+    size: A4;
+    margin: 20mm 18mm;
+  }
+}
