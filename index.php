@@ -116,7 +116,7 @@ require_once __DIR__ . '/includes/header.php';
 
       <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">Ready to Level Up?</h1>
       <p class="text-xs text-slate-400 text-center mb-6">
-        Enter your Student Code to launch your next session.
+        Enter your Access Code to jump back into your session.
       </p>
 
       <?php if (!empty($error_msg)): ?>
@@ -130,17 +130,17 @@ require_once __DIR__ . '/includes/header.php';
 
       <form method="POST" action="index.php" class="space-y-4">
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-indigo-600 uppercase tracking-wider">Your Access Code</label>
+          <label class="text-xs font-semibold text-[#3F00FF] uppercase tracking-wider">Your Access Code</label>
           <input
             type="text"
             name="uin"
             placeholder="e.g., ES-BOLD-EAGLE-42"
-            class="elysian-input text-center font-mono tracking-widest uppercase"
+            class="elysian-input text-center font-mono tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-[#3F00FF] focus:border-[#3F00FF]"
             required
           />
         </div>
 
-        <button type="submit" class="group w-full inline-flex items-center justify-center gap-2 mt-2 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+        <button type="submit" class="group w-full inline-flex items-center justify-center gap-2 mt-2 py-3.5 rounded-xl font-bold text-white bg-[#3F00FF] hover:bg-[#2E00B3] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
           Jump Back In 🚀
           <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -153,9 +153,9 @@ require_once __DIR__ . '/includes/header.php';
       </div>
 
       <div class="mt-4 pt-5 border-t border-slate-100 text-center text-xs">
-        <span class="text-slate-400">First time here? </span>
-        <a href="/register.php" class="text-amber-500 font-bold hover:underline">
-          Create an account
+        <span class="text-slate-400">New here? </span>
+        <a href="/register.php" class="text-[#3F00FF] font-bold hover:underline">
+          Get your Access Pass →
         </a>
       </div>
     </div>

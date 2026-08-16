@@ -67,9 +67,9 @@ require_once __DIR__ . '/includes/header.php';
     <div class="elysian-card p-8 bg-white/80 glass shadow-xl rounded-3xl overflow-hidden transition-all duration-300">
       
       <?php if (!$generated_uin): ?>
-        <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">Begin Diagnostic</h1>
+        <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">Unlock Your Growth Journey ✨</h1>
         <p class="text-xs text-slate-400 text-center mb-6">
-          Register to start your strategic growth path and get your personal Student Code.
+          Join Elysian today to claim your personal Access Pass and start leveling up.
         </p>
 
         <?php if (!empty($error_msg)): ?>
@@ -85,7 +85,7 @@ require_once __DIR__ . '/includes/header.php';
               type="text"
               name="name"
               placeholder="Enter your full name"
-              class="elysian-input"
+              class="elysian-input focus:outline-none focus:ring-2 focus:ring-[#3F00FF] focus:border-[#3F00FF]"
               required
             />
           </div>
@@ -96,20 +96,23 @@ require_once __DIR__ . '/includes/header.php';
               type="email"
               name="email"
               placeholder="name@example.com"
-              class="elysian-input"
+              class="elysian-input focus:outline-none focus:ring-2 focus:ring-[#3F00FF] focus:border-[#3F00FF]"
               required
             />
           </div>
 
-          <button type="submit" class="w-full elysian-btn elysian-btn-gold mt-2 py-3.5">
-            Create My Student Code
+          <button type="submit" class="group w-full inline-flex items-center justify-center gap-2 mt-2 py-3.5 rounded-xl font-bold text-white bg-[#3F00FF] hover:bg-[#2E00B3] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+            Get My Pass & Start 🚀
+            <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
           </button>
         </form>
 
         <div class="mt-6 pt-5 border-t border-slate-100 text-center text-xs">
-          <span class="text-slate-400">Already registered? </span>
-          <a href="/index.php" class="text-amber-500 font-bold hover:underline">
-            Log in here
+          <span class="text-slate-400">Have a code already? </span>
+          <a href="/index.php" class="text-[#3F00FF] font-bold hover:underline">
+            Jump back in →
           </a>
         </div>
       <?php else: ?>
