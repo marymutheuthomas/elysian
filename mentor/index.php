@@ -2064,21 +2064,12 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <!-- ── LEFT: Editor Panel ── -->
                 <div class="elysian-card flex flex-col overflow-hidden">
-                  <!-- Sticky Header Action Bar -->
-                  <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-md p-3.5 border-b border-gray-200 flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2">
-                      <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                      <div>
-                        <span class="text-xs font-bold text-gray-900 font-display">Component Builder</span>
-                        <p class="text-[9px] text-gray-500 font-mono"><?php echo $edit_block ? 'Editing: ' . htmlspecialchars(substr($b_question, 0, 24)) . (strlen($b_question) > 24 ? '…' : '') : 'New Component'; ?></p>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <button type="submit" form="block-authoring-form" onclick="asCompileAndSubmit(event)" class="elysian-btn elysian-btn-brand py-1.5 px-4 text-xs font-bold flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Save Changes
-                      </button>
-                      <a href="/mentor/index.php?tab=pillars&selected_program_id=<?php echo urlencode($selected_prog_id); ?>" class="text-gray-400 hover:text-gray-600 text-xs px-2">✕</a>
+                  <!-- Sticky Header (informational only — actions live in the bottom submit row) -->
+                  <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-md p-3.5 border-b border-gray-200 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                    <div>
+                      <span class="text-xs font-bold text-gray-900 font-display">Component Builder</span>
+                      <p class="text-[9px] text-gray-500 font-mono"><?php echo $edit_block ? 'Editing: ' . htmlspecialchars(substr($b_question, 0, 24)) . (strlen($b_question) > 24 ? '…' : '') : 'New Component'; ?></p>
                     </div>
                   </div>
 
@@ -2097,6 +2088,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                       <!-- ══ COMPOSITE BLOCK BUILDER ══════════════════════════════════════ -->
                       <div id="cbs-panel" class="mb-5">
+                        <div class="form-section-label">Component Elements</div>
                         <div class="flex items-center justify-between mb-3">
                           <button type="button" id="cbs-add-btn" onclick="cbsShowTypePicker()" class="flex items-center gap-1.0 px-[0.85rem] py-[0.3rem] text-[0.7rem] font-bold text-white bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg cursor-pointer shadow-sm hover:-translate-y-0.5 transition-all">
                             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
@@ -2145,10 +2137,10 @@ require_once __DIR__ . '/../includes/header.php';
                       </div>
                       <div style="border-top:1.5px dashed #E0E7FF; margin-bottom:1rem; margin-top:0.25rem;"></div>
 
-                      <!-- ⑥ Display Condition (showIf) -->
+                      <!-- Display Condition -->
 
                       <div>
-                        <div class="form-section-label">⑥ Display Condition (showIf)</div>
+                        <div class="form-section-label">Display Condition</div>
                         <div class="showif-toggle-wrap" id="showif-toggle">
                           <button type="button" class="showif-toggle-btn" id="si-always-btn" onclick="asSetShowIf('always')">Always Visible</button>
                           <button type="button" class="showif-toggle-btn" id="si-cond-btn" onclick="asSetShowIf('conditional')">Conditional</button>
@@ -2184,7 +2176,8 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                       </div>
 
-                      <!-- ⑦ Required toggle -->
+                      <!-- Required -->
+                      <div class="form-section-label">Required</div>
                       <div id="as-required-wrap" class="flex items-center gap-2.5 py-1">
                         <label class="relative inline-flex items-center cursor-pointer">
                           <input type="checkbox" id="as-required" name="b_required" value="1" <?php echo $b_req ? 'checked' : ''; ?> class="sr-only peer" onchange="asUpdatePreview()">
