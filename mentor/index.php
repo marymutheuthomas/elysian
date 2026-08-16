@@ -2188,9 +2188,9 @@ require_once __DIR__ . '/../includes/header.php';
 
                       <!-- Submit -->
                       <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                        <a href="/mentor/index.php?tab=pillars&selected_program_id=<?php echo urlencode($selected_prog_id); ?>" class="elysian-btn elysian-btn-ghost">Cancel</a>
-                        <button type="submit" class="elysian-btn elysian-btn-cyan" onclick="asCompileAndSubmit(event)">
-                          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <a href="/mentor/index.php?tab=pillars&selected_program_id=<?php echo urlencode($selected_prog_id); ?>" class="elysian-btn elysian-btn-ghost py-1.5 px-4 text-xs">Cancel</a>
+                        <button type="submit" class="elysian-btn elysian-btn-cyan py-1.5 px-4 text-xs font-bold flex items-center gap-1.5" onclick="asCompileAndSubmit(event)">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                           Save Block
                         </button>
                       </div>
