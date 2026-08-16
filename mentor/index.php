@@ -791,9 +791,9 @@ require_once __DIR__ . '/../includes/header.php';
             }
         }
         ?>
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-full lg:h-[calc(100vh-5rem)] min-h-0 items-stretch w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full min-h-[600px]">
           <!-- Student list -->
-          <div class="md:col-span-4 elysian-card overflow-hidden flex flex-col h-full min-h-0">
+          <div class="lg:col-span-4 elysian-card overflow-hidden flex flex-col h-full min-h-0">
             <div class="p-4 border-b border-gray-200 bg-[#EEF8CD]/50 flex items-center justify-between">
               <div>
                 <h3 class="font-bold text-sm text-gray-900 font-display">Student Inbox</h3>
@@ -832,7 +832,7 @@ require_once __DIR__ . '/../includes/header.php';
           </div>
 
           <!-- Student details and chat -->
-          <div class="md:col-span-8 h-full min-h-0 flex flex-col">
+          <div class="lg:col-span-8 h-full min-h-0 flex flex-col">
             <?php 
             $add_student = isset($_GET['add_student']) ? 1 : 0;
             $edit_student_id = isset($_GET['edit_student_id']) ? $_GET['edit_student_id'] : '';
