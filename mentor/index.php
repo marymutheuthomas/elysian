@@ -1877,7 +1877,7 @@ require_once __DIR__ . '/../includes/header.php';
         }
         ?>
 
-        <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 w-full h-full lg:h-[calc(100vh-5rem)] min-h-0 text-gray-800">
+        <div class="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] gap-6 w-full h-full lg:h-[calc(100vh-5rem)] min-h-0 text-gray-800">
 
           <!-- ══ LEFT COLUMN: 4-Tier Tree Navigation Sidebar ══ -->
           <div class="elysian-card p-5 flex flex-col h-full min-h-0 overflow-y-auto custom-scrollbar">
@@ -2020,7 +2020,7 @@ require_once __DIR__ . '/../includes/header.php';
           </div>
 
           <!-- ══ RIGHT COLUMN: Authoring Suite Editor + Preview ══ -->
-          <div class="min-w-0 w-full h-full min-h-0 flex flex-col gap-4">
+          <div class="min-w-0 w-full max-w-[900px] h-full min-h-0 flex flex-col gap-4">
 
             <?php if (isset($_GET['add_pillar']) || $edit_pillar): ?>
               <!-- ── Pillar Form ── -->
