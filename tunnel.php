@@ -745,7 +745,9 @@ require_once __DIR__ . '/includes/header.php';
                       </div>
 
                     <?php elseif ($elem_type === 'input_dropdown'):
-                      $opts_arr = array_filter(array_map('trim', explode(',', $elem['options'] ?? 'Option A, Option B')));
+                      $dropdown_opts_raw = trim($elem['options'] ?? '');
+                      if ($dropdown_opts_raw === '') $dropdown_opts_raw = 'Option A, Option B';
+                      $opts_arr = array_filter(array_map('trim', explode(',', $dropdown_opts_raw)));
                     ?>
                       <div class="space-y-1.5">
                         <?php if (!empty($elem['label'])): ?>

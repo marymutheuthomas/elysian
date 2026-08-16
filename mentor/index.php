@@ -2657,6 +2657,16 @@ require_once __DIR__ . '/../includes/header.php';
 
                 // ── Compile and submit ─────────────────────────────────────────
                 window.asCompileAndSubmit = function(e) {
+                  // Guard against saving a dropdown with blank/whitespace-only options,
+                  // which renders as an unselectable, unusable <select> for students.
+                  if (cbsStack) {
+                    cbsStack.forEach(elem => {
+                      if (elem.type === 'input_dropdown' && (!elem.options || !elem.options.trim())) {
+                        elem.options = 'Option A, Option B';
+                      }
+                    });
+                  }
+
                   // Compile composite content_schema JSON payload if stack has elements
                   const csField = document.getElementById('hf-content-schema');
                   if (csField) {
