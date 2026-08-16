@@ -632,7 +632,7 @@ $html_class = '';
   <!-- ══════════════════════════════════════════════════════════
        GLOBAL NAVIGATION HEADER
   ══════════════════════════════════════════════════════════ -->
-  <header id="app-header" class="no-print hidden lg:block">
+  <header id="app-header" class="no-print block">
     <div class="h-full max-w-screen-xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
 
       <!-- Logo -->
@@ -690,6 +690,52 @@ $html_class = '';
       </nav>
     </div>
   </header>
+
+  <?php
+  // ── Student progress stepper ──────────────────────────────────
+  // Shown only on mentee pages (programs/payment/tunnel/completed all
+  // fetch $student before including this file — PHP include shares
+  // caller scope, so no extra query or param-passing is needed here).
+  // Purely informational: steps are not links, students can't skip ahead.
+  if (!$is_mentor_route && isset($student) && is_array($student) && isset($student['status'])):
+      $ely_steps = [
+          'program_selection' => 'Program',
+          'payment_pending'   => 'Payment',
+          'active'            => 'Assessment',
+          'completed'         => 'Completed',
+      ];
+      $ely_step_keys = array_keys($ely_steps);
+      $ely_current_idx = array_search($student['status'], $ely_step_keys, true);
+      if ($ely_current_idx === false) $ely_current_idx = 0;
+  ?>
+    <div class="no-print" style="border-bottom:1px solid var(--color-border); background-color:var(--color-surface);">
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-center gap-1.5 sm:gap-2.5 overflow-x-auto">
+        <?php foreach ($ely_step_keys as $ely_i => $ely_key):
+            $ely_label  = $ely_steps[$ely_key];
+            $ely_done   = $ely_i < $ely_current_idx;
+            $ely_active = $ely_i === $ely_current_idx;
+        ?>
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                  style="<?php
+                      if ($ely_active) echo 'background:var(--color-cyan); color:#fff;';
+                      elseif ($ely_done) echo 'background:var(--color-emerald); color:#fff;';
+                      else echo 'background:var(--color-bg); border:1px solid var(--color-border); color:var(--color-text-muted);';
+                  ?>">
+              <?php echo $ely_done ? '✓' : ($ely_i + 1); ?>
+            </span>
+            <span class="text-xs font-semibold whitespace-nowrap"
+                  style="color:<?php echo $ely_active ? 'var(--color-cyan)' : ($ely_done ? 'var(--color-text)' : 'var(--color-text-muted)'); ?>;">
+              <?php echo htmlspecialchars($ely_label); ?>
+            </span>
+          </div>
+          <?php if ($ely_i < count($ely_step_keys) - 1): ?>
+            <span class="w-4 sm:w-8 h-px flex-shrink-0" style="background-color:var(--color-border);"></span>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  <?php endif; ?>
 
   <!-- ══════════════════════════════════════════════════════════
        MAIN CONTENT SHELL — pages inject their content here

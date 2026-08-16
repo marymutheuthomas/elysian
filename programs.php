@@ -87,34 +87,6 @@ require_once __DIR__ . '/includes/header.php';
   <!-- Decorative blurs -->
   <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl -z-10 animate-pulse"></div>
 
-  <!-- Header Bar -->
-  <div class="max-w-4xl w-full flex items-center justify-between mb-12 border-b border-slate-200/50 pb-6">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg">
-        <span class="text-white font-extrabold text-base">E</span>
-      </div>
-      <div>
-        <h2 class="font-extrabold text-base tracking-wide uppercase text-slate-800">
-          Elysian Accelerator
-        </h2>
-        <p class="text-[10px] text-slate-400 font-semibold font-mono uppercase">
-          UIN: <?php echo htmlspecialchars($student['permanent_id']); ?>
-        </p>
-      </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">
-        Student: <?php echo htmlspecialchars($student['name']); ?>
-      </span>
-      <a
-        href="/logout.php"
-        class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-700 bg-slate-100/50 hover:bg-slate-100 rounded-xl transition-all border border-slate-200/40"
-      >
-        Logout
-      </a>
-    </div>
-  </div>
-
   <!-- Main content -->
   <div class="max-w-2xl w-full">
     <div class="text-center mb-10">
