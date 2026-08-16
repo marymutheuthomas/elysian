@@ -1632,20 +1632,47 @@ require_once __DIR__ . '/../includes/header.php';
              AUTHORING SUITE STYLES
         ════════════════════════════════════════════════════════════ -->
         <style>
-          /* Authoring suite: Editor Panel and Preview Panel are mutually
-             exclusive (toggled via toggleComponentPreview()), so only one
-             ever occupies the row — single column, no permanent 50/50 split. */
+          /* Authoring suite: Editor Panel is always full width. The Preview
+             is a slide-over drawer (toggled via toggleComponentPreview()) that
+             overlays the right edge instead of sharing the row with the editor. */
           .authoring-split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-height: 100%; }
-          .preview-panel { min-height: 500px; }
 
-          /* Preview Panel — light mint-tinted chrome */
+          /* Preview Panel — light mint-tinted chrome, off-canvas drawer */
           .preview-panel {
             background: #FAFAFA;
             border: 1px solid #E2E8F0;
-            border-radius: 1.25rem;
+            border-radius: 1.25rem 0 0 1.25rem;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 400px;
+            max-width: 90vw;
+            z-index: 60;
+            box-shadow: -12px 0 32px rgba(15, 23, 42, 0.18);
+            transform: translateX(100%);
+            visibility: hidden;
+            transition: transform 0.3s ease, visibility 0.3s ease;
+          }
+          .preview-panel.drawer-open {
+            transform: translateX(0);
+            visibility: visible;
+          }
+          .preview-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.35);
+            z-index: 55;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+          }
+          .preview-backdrop.backdrop-open {
+            opacity: 1;
+            pointer-events: auto;
           }
           .preview-header {
             background: linear-gradient(135deg, #BBF1D2 0%, #EEF8CD 100%);
@@ -2282,8 +2309,11 @@ require_once __DIR__ . '/../includes/header.php';
                   </div>
                 </div>
 
-                <!-- ── RIGHT: Student Preview Panel ── -->
-                <div id="preview-panel-wrap" class="preview-panel hidden">
+                <!-- Backdrop for the slide-over preview drawer -->
+                <div id="preview-backdrop" class="preview-backdrop" onclick="toggleComponentPreview()"></div>
+
+                <!-- ── RIGHT: Student Preview Panel (slide-over drawer) ── -->
+                <div id="preview-panel-wrap" class="preview-panel">
                   <div class="preview-header">
                     <span class="preview-dot" style="background:#ef4444;"></span>
                     <span class="preview-dot" style="background:#f59e0b;"></span>
@@ -2308,10 +2338,12 @@ require_once __DIR__ . '/../includes/header.php';
               <!-- ── Authoring Suite JavaScript ── -->
               <script>
               (function() {
-                // ── Toggle: Editor Panel <-> Student Mode Preview (mutually exclusive) ──
+                // ── Toggle: Student Mode Preview slide-over drawer ──
+                // Editor Panel stays full width and anchored in place; the
+                // preview slides in from the right edge as an overlay instead.
                 window.toggleComponentPreview = function() {
-                  document.getElementById('editor-panel').classList.toggle('hidden');
-                  document.getElementById('preview-panel-wrap').classList.toggle('hidden');
+                  document.getElementById('preview-panel-wrap').classList.toggle('drawer-open');
+                  document.getElementById('preview-backdrop').classList.toggle('backdrop-open');
                 };
 
                 // ── Debounce Helper Function (Step 3 Optimization) ───────────
