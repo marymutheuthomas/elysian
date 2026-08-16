@@ -654,15 +654,6 @@ require_once __DIR__ . '/includes/header.php';
 ══════════════════════════════════════════════════════════════ -->
 <div class="max-w-7xl mx-auto px-4 pb-24 w-full">
 
-  <?php if (isset($_GET['new_content']) || ($active_index < count($visibleComponents) && $active_index > 0)): ?>
-    <div class="mb-4 p-3.5 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-between gap-3 text-xs font-semibold text-indigo-900 dark:text-indigo-200">
-      <div class="flex items-center gap-2.5">
-        <span class="text-base">✨</span>
-        <span>Your mentor added new course content! Continue below from Step <strong><?php echo $active_index + 1; ?></strong>.</span>
-      </div>
-    </div>
-  <?php endif; ?>
-
   <div class="flex flex-col lg:flex-row gap-6">
 
 
