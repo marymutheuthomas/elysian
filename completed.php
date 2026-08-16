@@ -209,14 +209,47 @@ foreach ($visibleComponents as $c) {
 }
 
 // ── Handle Mentor Engagement Prompt ───────────────────────────
+// Posting this both notifies the mentor (an auto-message on the thread)
+// and flips the CTA card into the embedded chat panel below.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_engagement_prompt'])) {
     $msg = "I have completed my strategy assessment and am ready for a review!";
-    $msg_id = 'msg_' . substr(md5(uniqid(rand(), true)), 0, 10);
-    $stmt_msg = $pdo->prepare("INSERT INTO `messages` (`id`, `thread_id`, `sender_name`, `content`) VALUES (?, ?, ?, ?)");
+    $msg_id = 'MSG-' . time() . '-' . rand(10, 99);
+    $stmt_msg = $pdo->prepare("INSERT INTO `messages` (`id`, `thread_id`, `sender`, `sender_label`, `content`) VALUES (?, ?, 'student', ?, ?)");
     $stmt_msg->execute([$msg_id, $student_id, $student['name'], $msg]);
     header("Location: /completed.php?prompt_sent=1");
     exit;
 }
+
+// ── POST: Send chat message (same pattern/table as tunnel.php) ─
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_chat'])) {
+    $chat_content = isset($_POST['chat_content']) ? trim($_POST['chat_content']) : '';
+    if (!empty($chat_content)) {
+        $msg_id = 'MSG-' . time() . '-' . rand(10, 99);
+        $pdo->prepare("INSERT INTO `messages` (`id`, `thread_id`, `sender`, `sender_label`, `content`) VALUES (?, ?, 'student', ?, ?)")
+            ->execute([$msg_id, $student_id, $student['name'], $chat_content]);
+    }
+    if (isset($_GET['ajax'])) {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success']);
+        exit;
+    }
+    header("Location: /completed.php?prompt_sent=1");
+    exit;
+}
+
+// ── AJAX: Fetch chat (for polling) ────────────────────────────
+if (isset($_GET['fetch_chat'])) {
+    header('Content-Type: application/json');
+    $stmt_chat = $pdo->prepare("SELECT * FROM `messages` WHERE `thread_id` = ? ORDER BY `timestamp` ASC");
+    $stmt_chat->execute([$student_id]);
+    echo json_encode($stmt_chat->fetchAll());
+    exit;
+}
+
+// ── Fetch chat messages for initial render ────────────────────
+$stmt_chat = $pdo->prepare("SELECT * FROM `messages` WHERE `thread_id` = ? ORDER BY `timestamp` ASC");
+$stmt_chat->execute([$student_id]);
+$chat_messages = $stmt_chat->fetchAll();
 
 // ── All redirects done. Output HTML ───────────────────────────
 require_once __DIR__ . '/includes/header.php';
@@ -306,6 +339,9 @@ require_once __DIR__ . '/includes/header.php';
         <p class="text-xs md:text-sm text-muted leading-relaxed max-w-xl">
           Congratulations, <strong><?php echo htmlspecialchars($student['name']); ?></strong>! You have successfully completed all diagnostic pillars and compiled your strategic roadmap.
         </p>
+        <a href="/tunnel.php" class="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+          📖 Review Your Coursework →
+        </a>
       </div>
 
       <?php if ($showArchetype): ?>
@@ -457,17 +493,33 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 
     <!-- ── Tile 5: Mentor Alignment CTA (Span 6) ────────────────── -->
-    <div class="bento-tile col-span-12 md:col-span-6 p-6 flex flex-col justify-between" id="mentor-prompt-card">
+    <div class="bento-tile col-span-12 md:col-span-6 p-6 flex flex-col" id="mentor-prompt-card">
       <?php if (isset($_GET['prompt_sent'])): ?>
-        <div class="flex flex-col justify-between h-full">
-          <div>
-            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block mb-2 font-mono">Mentor Notified ✓</span>
-            <h3 class="text-base font-bold text-main font-display">Review Request Submitted</h3>
-            <p class="text-xs text-muted mt-1 leading-relaxed">Your mentor has received your completion alert and will review your strategy shortly.</p>
+        <div class="flex flex-col h-full">
+          <div class="mb-3 flex-shrink-0">
+            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block mb-1 font-mono">Mentor Notified ✓</span>
+            <h3 class="text-sm font-bold text-main font-display">Chat with your mentor</h3>
           </div>
-          <a href="/tunnel.php" class="elysian-btn elysian-btn-brand py-2.5 px-4 text-xs font-bold inline-flex items-center gap-2 self-start mt-4">
-            Open Mentor Chat →
-          </a>
+          <div id="chat-messages-container" class="flex-1 min-h-[200px] max-h-72 overflow-y-auto flex flex-col gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-subtle">
+            <?php if (count($chat_messages) === 0): ?>
+              <div class="text-center py-8 text-muted text-[11px] italic">No messages yet. Send one below to reach your mentor.</div>
+            <?php else: ?>
+              <?php foreach ($chat_messages as $msg): ?>
+                <?php $is_student = ($msg['sender'] === 'student'); ?>
+                <div class="<?php echo $is_student ? 'chat-bubble-student' : 'chat-bubble-mentor'; ?>">
+                  <div class="text-[8px] opacity-60 font-bold uppercase tracking-wider mb-0.5"><?php echo htmlspecialchars($msg['sender_label']); ?></div>
+                  <div class="leading-relaxed text-xs"><?php echo htmlspecialchars($msg['content']); ?></div>
+                </div>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </div>
+          <form id="chat-form" method="POST" action="/completed.php?prompt_sent=1" class="mt-3 flex gap-2 flex-shrink-0">
+            <input type="hidden" name="send_chat" value="1">
+            <input type="text" id="chat-input" name="chat_content" placeholder="Ask a question..." class="ely-input text-xs" required autocomplete="off">
+            <button type="submit" class="elysian-btn elysian-btn-brand p-2.5 rounded-xl flex-shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+          </form>
         </div>
       <?php else: ?>
         <div>
@@ -512,6 +564,54 @@ function switchTab(tabId) {
   const activeContent = document.getElementById('tab-content-' + tabId);
   activeContent.classList.remove('hidden');
   activeContent.classList.add('block');
+}
+
+// ── Mentor chat: polling & sending (mirrors tunnel.php's chat) ──
+function scrollChatToBottom() {
+  const c = document.getElementById('chat-messages-container');
+  if (c) c.scrollTop = c.scrollHeight;
+}
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(String(str)));
+  return d.innerHTML;
+}
+function pollMessages() {
+  const c = document.getElementById('chat-messages-container');
+  if (!c) return;
+  fetch('completed.php?fetch_chat=1')
+    .then(r => r.json())
+    .then(data => {
+      if (data.length === 0) {
+        c.innerHTML = '<div class="text-center py-8 text-muted text-[11px] italic">No messages yet. Send one below to reach your mentor.</div>';
+        return;
+      }
+      let html = '';
+      data.forEach(msg => {
+        const isStudent = (msg.sender === 'student');
+        const bubble = isStudent ? 'chat-bubble-student' : 'chat-bubble-mentor';
+        html += `<div class="${bubble}"><div class="text-[8px] opacity-60 font-bold uppercase tracking-wider mb-0.5">${escapeHtml(msg.sender_label)}</div><div class="leading-relaxed text-xs">${escapeHtml(msg.content)}</div></div>`;
+      });
+      if (c.innerHTML !== html) { c.innerHTML = html; scrollChatToBottom(); }
+    })
+    .catch(e => console.error('Chat poll failed', e));
+}
+document.getElementById('chat-form')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const val = input.value.trim();
+  if (!val) return;
+  const fd = new FormData();
+  fd.append('send_chat', '1');
+  fd.append('chat_content', val);
+  input.value = '';
+  fetch('completed.php?prompt_sent=1&ajax=1', { method: 'POST', body: fd })
+    .then(r => r.json()).then(() => pollMessages())
+    .catch(e => console.error('Chat send failed', e));
+});
+if (document.getElementById('chat-messages-container')) {
+  setInterval(pollMessages, 5000);
+  document.addEventListener('DOMContentLoaded', scrollChatToBottom);
 }
 </script>
 

@@ -164,13 +164,24 @@ if ($student['status'] === 'completed' && $active_index < count($visibleComponen
     $student['status'] = 'active';
 }
 
-// ── Redirect to completion if done ───────────────────────────
+// ── Redirect to completion if done, or enter read-only review ─
+// The first time a student finishes (status wasn't already 'completed'),
+// mark them done and send them to the summary page as before. If they're
+// already completed and land here again (e.g. "Review Your Coursework"
+// from completed.php), don't bounce them away — let them browse read-only
+// instead. $isReview repurposes $active_index as a display-only position;
+// it is never written back to the DB (all mutating handlers below refuse
+// to run while $isReview is true), so this is safe.
+$isReview = false;
 if ($student['status'] === 'completed' || ($active_index >= count($visibleComponents) && count($visibleComponents) > 0)) {
     if ($student['status'] !== 'completed') {
         $pdo->prepare("UPDATE `students` SET `status` = 'completed' WHERE `permanent_id` = ?")->execute([$student_id]);
+        header("Location: /completed.php");
+        exit;
     }
-    header("Location: /completed.php");
-    exit;
+    $isReview = true;
+    $active_index = isset($_GET['view']) ? (int)$_GET['view'] : 0;
+    $active_index = max(0, min($active_index, count($visibleComponents) - 1));
 }
 
 $currentComp = $visibleComponents[$active_index] ?? null;
@@ -250,8 +261,13 @@ if (isset($_GET['get_reveal'])) {
     exit;
 }
 
-// ── AJAX: Auto-save draft (no advance) ───────────────────────
+// ── AJAX: Auto-save draft (no advance; blocked while reviewing) ─
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['autosave'])) {
+    if ($isReview) {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'read_only']);
+        exit;
+    }
     $block_id   = $_POST['block_id'] ?? '';
     $answer_val = $_POST['answer'] ?? '';
     if ($block_id) {
@@ -267,7 +283,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['autosave'])) {
 // ── GET: Sidebar jump-to (go back to a prior pillar) ─────────
 if (isset($_GET['jump_to'])) {
     $jump_idx = (int)$_GET['jump_to'];
-    if ($jump_idx >= 0 && $jump_idx < $active_index) {
+    if ($isReview) {
+        // Review mode: navigate via the display-only `view` param, never write to the DB.
+        if ($jump_idx >= 0 && $jump_idx < count($visibleComponents)) {
+            header("Location: /tunnel.php?view=" . $jump_idx);
+            exit;
+        }
+    } elseif ($jump_idx >= 0 && $jump_idx < $active_index) {
         $pdo->prepare("UPDATE `students` SET `active_block_index` = ? WHERE `permanent_id` = ?")
             ->execute([$jump_idx, $student_id]);
         header("Location: /tunnel.php");
@@ -276,7 +298,7 @@ if (isset($_GET['jump_to'])) {
 }
 
 // ── POST: Go back one step ────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['go_back'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['go_back']) && !$isReview) {
     $new_index = max(0, $active_index - 1);
     $pdo->prepare("UPDATE `students` SET `active_block_index` = ? WHERE `permanent_id` = ?")
         ->execute([$new_index, $student_id]);
@@ -284,8 +306,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['go_back'])) {
     exit;
 }
 
-// ── POST: Submit answer & advance ────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_block']) && $currentComp) {
+// ── POST: Submit answer & advance (blocked while reviewing) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_block']) && $currentComp && !$isReview) {
 
     $comp_id    = $currentComp['id'];
     $answer_val = $_POST['answer'] ?? '';
@@ -565,6 +587,20 @@ require_once __DIR__ . '/includes/header.php';
 
 <?php else: ?>
 
+<?php if ($isReview): ?>
+<div class="max-w-7xl mx-auto px-4 pt-4">
+  <div class="mb-2 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+      <span>📖</span>
+      <span>Reviewing your completed coursework — read-only, nothing you view here changes your saved answers.</span>
+    </div>
+    <a href="/completed.php" class="elysian-btn elysian-btn-ghost text-xs font-bold px-3 py-1.5 whitespace-nowrap">
+      ← Return to Summary
+    </a>
+  </div>
+</div>
+<?php endif; ?>
+
 <!-- ══════════════════════════════════════════════════════════════
      STICKY TOP SHELL & PROGRESS BAR
 ══════════════════════════════════════════════════════════════ -->
@@ -624,7 +660,9 @@ require_once __DIR__ . '/includes/header.php';
             foreach ($visibleComponents as $vi => $vc) {
               if ($vc['_pillar_id'] === $pil['id']) { $pillar_first_idx = $vi; break; }
             }
-            $can_jump = ($pillar_first_idx !== null && $pillar_first_idx < $active_index && !$is_active);
+            $can_jump = $isReview
+                ? ($pillar_first_idx !== null && !$is_active)
+                : ($pillar_first_idx !== null && $pillar_first_idx < $active_index && !$is_active);
           ?>
             <div class="flex items-start gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 <?php echo $is_active ? 'bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-bold' : 'text-main hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent'; ?>">
               <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5 <?php echo $is_active ? 'bg-indigo-600 text-white' : ($is_done ? 'bg-emerald-500 text-white' : ($is_started ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-200 dark:bg-slate-700 text-muted')); ?>">
@@ -632,7 +670,7 @@ require_once __DIR__ . '/includes/header.php';
               </div>
               <div class="flex-1 min-w-0">
                 <?php if ($can_jump): ?>
-                  <a href="/tunnel.php?jump_to=<?php echo $pillar_first_idx; ?>" class="block hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate">
+                  <a href="/tunnel.php?<?php echo $isReview ? 'view' : 'jump_to'; ?>=<?php echo $pillar_first_idx; ?>" class="block hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate">
                     <?php echo htmlspecialchars($pil['title']); ?>
                   </a>
                 <?php else: ?>
@@ -684,6 +722,7 @@ require_once __DIR__ . '/includes/header.php';
           <div class="<?php echo $card_wrapper_cls; ?>">
             <form method="POST" action="tunnel.php" id="main-form" enctype="multipart/form-data">
               <input type="hidden" name="submit_block" value="1">
+              <?php if ($isReview): ?><fieldset disabled style="border:none; padding:0; margin:0;"><?php endif; ?>
 
               <?php
               $content_schema_raw = $currentComp['content_schema'] ?? '';
@@ -1316,6 +1355,7 @@ require_once __DIR__ . '/includes/header.php';
               </div>
               <?php endif; ?>
 
+              <?php if ($isReview): ?></fieldset><?php endif; ?>
             </form>
           </div>
         </div>
@@ -1370,7 +1410,34 @@ require_once __DIR__ . '/includes/header.php';
 ══════════════════════════════════════════════════════════════ -->
 <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-subtle py-3 px-4 shadow-lg">
   <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-    
+
+  <?php if ($isReview): ?>
+    <!-- Review mode: browse only, no save/advance -->
+    <?php if ($active_index > 0): ?>
+      <a href="/tunnel.php?view=<?php echo $active_index - 1; ?>" class="elysian-btn elysian-btn-ghost text-xs font-bold px-4 py-2.5 rounded-xl">
+        ← Previous
+      </a>
+    <?php else: ?>
+      <button type="button" disabled class="elysian-btn elysian-btn-ghost text-xs font-bold px-4 py-2.5 rounded-xl opacity-40 cursor-not-allowed">
+        ← Previous
+      </button>
+    <?php endif; ?>
+
+    <a href="/completed.php" class="text-[11px] font-semibold text-muted hover:text-main transition-colors">
+      Reviewing (read-only) — Return to Summary
+    </a>
+
+    <?php if ($active_index < count($visibleComponents) - 1): ?>
+      <a href="/tunnel.php?view=<?php echo $active_index + 1; ?>" class="elysian-btn elysian-btn-brand px-6 py-2.5 text-xs font-bold shadow-md flex items-center gap-2">
+        Next →
+      </a>
+    <?php else: ?>
+      <a href="/completed.php" class="elysian-btn elysian-btn-brand px-6 py-2.5 text-xs font-bold shadow-md flex items-center gap-2">
+        Done Reviewing →
+      </a>
+    <?php endif; ?>
+
+  <?php else: ?>
     <!-- ← Back button -->
     <?php if ($active_index > 0): ?>
       <button type="submit" name="go_back" value="1" form="back-form" class="elysian-btn elysian-btn-ghost text-xs font-bold px-4 py-2.5 rounded-xl">
@@ -1403,6 +1470,7 @@ require_once __DIR__ . '/includes/header.php';
         Save & Advance →
       </button>
     <?php endif; ?>
+  <?php endif; ?>
 
   </div>
 </div>
