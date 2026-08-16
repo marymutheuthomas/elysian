@@ -150,13 +150,6 @@ require_once __DIR__ . '/includes/header.php';
         </a>
       </div>
     </div>
-
-    <!-- Mentor Portal Link -->
-    <div class="text-center mt-6">
-      <a href="/mentor/index.php" class="text-xs text-slate-400 font-medium hover:text-amber-500 transition-colors">
-        Access Mentor Portal
-      </a>
-    </div>
   </div>
 </div>
 

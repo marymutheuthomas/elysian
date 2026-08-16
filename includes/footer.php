@@ -24,6 +24,8 @@
            onmouseout="this.style.color='var(--color-text-muted)'">Terms of Service</a>
         <a href="#" style="color:inherit;" onmouseover="this.style.color='var(--color-cyan)'"
            onmouseout="this.style.color='var(--color-text-muted)'">Support</a>
+        <a href="/mentor/index.php" style="color:inherit; opacity:0.55;" onmouseover="this.style.opacity='1'"
+           onmouseout="this.style.opacity='0.55'">Staff Access</a>
       </div>
     </div>
   </footer>
