@@ -2,6 +2,7 @@
 // completed.php — Completion Engine & Export Center (Bento Grid Theme)
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/profiles.php';
+require_once __DIR__ . '/includes/component_archive.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -205,6 +206,22 @@ foreach ($visibleComponents as $c) {
         $goalComponents[] = $c;
     } else {
         $reflectionComponents[] = $c;
+    }
+}
+
+// ── Archived fallback: keep answers visible even if the mentor later
+//    deleted the question that produced them ────────────────────────
+$live_comp_ids = array_column($allComponents, 'id');
+$missing_answer_ids = array_diff(array_keys($answers), $live_comp_ids);
+$archived_answer_map = getArchivedComponents($pdo, $missing_answer_ids);
+foreach ($archived_answer_map as $arc_id => $arc) {
+    $arc_answer = $answers[$arc_id] ?? '';
+    if ($arc_answer === '' || (is_array($arc_answer) && empty($arc_answer))) continue;
+    $synthetic = ['id' => $arc_id, 'type' => $arc['type'], 'question' => $arc['question'], '_archived' => true];
+    if ($arc['type'] === 'goal') {
+        $goalComponents[] = $synthetic;
+    } else {
+        $reflectionComponents[] = $synthetic;
     }
 }
 
@@ -432,6 +449,9 @@ require_once __DIR__ . '/includes/header.php';
             <div class="border-b border-subtle pb-3.5 last:border-b-0">
               <span class="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">
                 <?php echo htmlspecialchars($block['question']); ?>
+                <?php if (!empty($block['_archived'])): ?>
+                  <span class="italic normal-case font-normal">— this item was later removed by your mentor</span>
+                <?php endif; ?>
               </span>
               <span class="text-base font-bold text-indigo-600 dark:text-indigo-400 whitespace-pre-wrap leading-relaxed">
                 <?php echo htmlspecialchars($answer); ?>
@@ -457,6 +477,9 @@ require_once __DIR__ . '/includes/header.php';
             <div class="border-b border-subtle pb-3.5 last:border-b-0">
               <span class="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">
                 <?php echo htmlspecialchars($block['question']); ?>
+                <?php if (!empty($block['_archived'])): ?>
+                  <span class="italic normal-case font-normal">— this item was later removed by your mentor</span>
+                <?php endif; ?>
               </span>
               <span class="text-xs text-main whitespace-pre-wrap leading-relaxed">
                 <?php echo htmlspecialchars(is_array($answer) ? implode(', ', $answer) : $answer); ?>
@@ -720,6 +743,9 @@ if (document.getElementById('chat-messages-container')) {
           <div class="border-b border-gray-200 pb-2 mb-2">
             <span class="text-[10px] font-bold text-gray-500 uppercase block tracking-wider mb-1">
               <?php echo htmlspecialchars($block['question']); ?>
+              <?php if (!empty($block['_archived'])): ?>
+                <span class="italic normal-case font-normal">(item later removed by mentor)</span>
+              <?php endif; ?>
             </span>
             <span class="text-base text-gray-900 font-bold whitespace-pre-wrap leading-relaxed block">
               <?php echo htmlspecialchars($answer); ?>
@@ -747,6 +773,9 @@ if (document.getElementById('chat-messages-container')) {
           <div class="border-b border-gray-200 pb-2 mb-2">
             <span class="text-[10px] font-bold text-gray-500 uppercase block tracking-wider mb-1">
               <?php echo htmlspecialchars($block['question']); ?>
+              <?php if (!empty($block['_archived'])): ?>
+                <span class="italic normal-case font-normal">(item later removed by mentor)</span>
+              <?php endif; ?>
             </span>
             <span class="text-xs text-gray-900 font-medium whitespace-pre-wrap leading-relaxed block">
               <?php echo htmlspecialchars(is_array($answer) ? implode(', ', $answer) : $answer); ?>

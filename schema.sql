@@ -89,6 +89,19 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Snapshot of a component's question/type/options taken right before a mentor
+-- deletes it, so students' previously-submitted answers stay meaningful even
+-- after the source content is gone (student answers are never deleted, but the
+-- question text they answered lives only here once the live row is removed).
+CREATE TABLE IF NOT EXISTS `component_archive` (
+  `id` VARCHAR(50) NOT NULL PRIMARY KEY,
+  `pillar_title` VARCHAR(255) NULL,
+  `type` VARCHAR(50) NULL,
+  `question` TEXT NULL,
+  `options` TEXT NULL,
+  `deleted_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Trait Schemes & Assessment Registry (scheme-agnostic evaluation engine)
 CREATE TABLE IF NOT EXISTS `trait_schemes` (
   `scheme_id` VARCHAR(50) NOT NULL PRIMARY KEY,

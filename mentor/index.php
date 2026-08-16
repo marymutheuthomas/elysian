@@ -4,6 +4,7 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/profiles.php';
 require_once __DIR__ . '/../includes/evaluation_engine.php';
 require_once __DIR__ . '/../includes/component_type.php';
+require_once __DIR__ . '/../includes/component_archive.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -60,6 +61,18 @@ if ($is_logged_in) {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     } catch (Throwable $t) {}
 
+    // Auto-migration: archive table for content deleted out from under students' answers
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `component_archive` (
+            `id` VARCHAR(50) NOT NULL PRIMARY KEY,
+            `pillar_title` VARCHAR(255) NULL,
+            `type` VARCHAR(50) NULL,
+            `question` TEXT NULL,
+            `options` TEXT NULL,
+            `deleted_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    } catch (Throwable $t) {}
+
     try { $pdo->exec("ALTER TABLE `programs` ADD COLUMN `scheme_id` VARCHAR(50) NULL"); } catch (Throwable $t) {}
     try { $pdo->exec("ALTER TABLE `students` ADD COLUMN `raw_scores` TEXT NULL"); } catch (Throwable $t) {}
     try { $pdo->exec("ALTER TABLE `students` ADD COLUMN `archetype_id` VARCHAR(50) NULL"); } catch (Throwable $t) {}
@@ -101,7 +114,14 @@ if ($is_logged_in) {
     } catch (Throwable $t) {}
 
     // Auto-cleanup: remove unassigned/orphaned components that lack a valid block or pillar
+    // (archive first — this runs on every page load and would otherwise silently
+    // destroy question context for any student who already answered one of these)
     try {
+        $pdo->exec("INSERT INTO `component_archive` (`id`, `pillar_title`, `type`, `question`, `options`)
+            SELECT c.id, p.title, c.type, c.question, c.options
+            FROM `components` c LEFT JOIN `pillars` p ON c.pillar_id = p.id
+            WHERE c.block_id IS NULL OR c.block_id = '' OR c.pillar_id NOT IN (SELECT `id` FROM `pillars`)
+            ON DUPLICATE KEY UPDATE pillar_title=VALUES(pillar_title), type=VALUES(type), question=VALUES(question), options=VALUES(options), deleted_at=CURRENT_TIMESTAMP");
         $pdo->exec("DELETE FROM `components` WHERE `block_id` IS NULL OR `block_id` = '' OR `pillar_id` NOT IN (SELECT `id` FROM `pillars`)");
     } catch (Throwable $t) {}
 
@@ -169,6 +189,13 @@ if ($is_logged_in) {
     if ($action === 'delete_program') {
         $prog_id = isset($_GET['id']) ? $_GET['id'] : '';
         if (!empty($prog_id)) {
+            // Snapshot component context before it's gone, so students' answers stay meaningful.
+            $pdo->prepare("INSERT INTO `component_archive` (`id`, `pillar_title`, `type`, `question`, `options`)
+                SELECT c.id, p.title, c.type, c.question, c.options
+                FROM `components` c JOIN `pillars` p ON c.pillar_id = p.id
+                WHERE p.program_id = ?
+                ON DUPLICATE KEY UPDATE pillar_title=VALUES(pillar_title), type=VALUES(type), question=VALUES(question), options=VALUES(options), deleted_at=CURRENT_TIMESTAMP")
+                ->execute([$prog_id]);
             $pdo->prepare("DELETE FROM `components` WHERE `pillar_id` IN (SELECT `id` FROM `pillars` WHERE `program_id` = ?)")->execute([$prog_id]);
             $pdo->prepare("DELETE FROM `blocks` WHERE `pillar_id` IN (SELECT `id` FROM `pillars` WHERE `program_id` = ?)")->execute([$prog_id]);
             $pdo->prepare("DELETE FROM `pillars` WHERE `program_id` = ?")->execute([$prog_id]);
@@ -284,6 +311,13 @@ if ($is_logged_in) {
         $nb_id     = isset($_GET['id']) ? $_GET['id'] : '';
         $nb_prog   = isset($_GET['program_id']) ? $_GET['program_id'] : '';
         if (!empty($nb_id)) {
+            // Snapshot component context before it's gone, so students' answers stay meaningful.
+            $pdo->prepare("INSERT INTO `component_archive` (`id`, `pillar_title`, `type`, `question`, `options`)
+                SELECT c.id, p.title, c.type, c.question, c.options
+                FROM `components` c JOIN `pillars` p ON c.pillar_id = p.id
+                WHERE c.block_id = ?
+                ON DUPLICATE KEY UPDATE pillar_title=VALUES(pillar_title), type=VALUES(type), question=VALUES(question), options=VALUES(options), deleted_at=CURRENT_TIMESTAMP")
+                ->execute([$nb_id]);
             // Delete all components belonging to this block, then delete the block
             $pdo->prepare("DELETE FROM `components` WHERE `block_id` = ?")->execute([$nb_id]);
             $pdo->prepare("DELETE FROM `blocks` WHERE `id` = ?")->execute([$nb_id]);
@@ -355,6 +389,13 @@ if ($is_logged_in) {
         $p_id = isset($_GET['id']) ? $_GET['id'] : '';
         $p_prog_id = isset($_GET['program_id']) ? $_GET['program_id'] : '';
         if (!empty($p_id)) {
+            // Snapshot component context before it's gone, so students' answers stay meaningful.
+            $pdo->prepare("INSERT INTO `component_archive` (`id`, `pillar_title`, `type`, `question`, `options`)
+                SELECT c.id, p.title, c.type, c.question, c.options
+                FROM `components` c JOIN `pillars` p ON c.pillar_id = p.id
+                WHERE c.pillar_id = ?
+                ON DUPLICATE KEY UPDATE pillar_title=VALUES(pillar_title), type=VALUES(type), question=VALUES(question), options=VALUES(options), deleted_at=CURRENT_TIMESTAMP")
+                ->execute([$p_id]);
             $pdo->prepare("DELETE FROM `components` WHERE `pillar_id` = ?")->execute([$p_id]);
             $pdo->prepare("DELETE FROM `blocks` WHERE `pillar_id` = ?")->execute([$p_id]);
             $pdo->prepare("DELETE FROM `pillars` WHERE `id` = ?")->execute([$p_id]);
@@ -488,6 +529,13 @@ if ($is_logged_in) {
         $b_id = isset($_GET['id']) ? $_GET['id'] : '';
         $b_prog_id = isset($_GET['program_id']) ? $_GET['program_id'] : '';
         if (!empty($b_id)) {
+            // Snapshot component context before it's gone, so students' answers stay meaningful.
+            $pdo->prepare("INSERT INTO `component_archive` (`id`, `pillar_title`, `type`, `question`, `options`)
+                SELECT c.id, p.title, c.type, c.question, c.options
+                FROM `components` c JOIN `pillars` p ON c.pillar_id = p.id
+                WHERE c.id = ?
+                ON DUPLICATE KEY UPDATE pillar_title=VALUES(pillar_title), type=VALUES(type), question=VALUES(question), options=VALUES(options), deleted_at=CURRENT_TIMESTAMP")
+                ->execute([$b_id]);
             $stmt = $pdo->prepare("DELETE FROM `components` WHERE `id` = ?");
             $stmt->execute([$b_id]);
         }
@@ -975,6 +1023,11 @@ require_once __DIR__ . '/../includes/header.php';
 
               // Calculate program progress
               $s_answers = json_decode($sel_stud['answers'], true) ?: [];
+
+              // Archived fallback for answers whose original component was deleted
+              $missing_comp_ids = array_diff(array_keys($s_answers), array_keys($all_comps_map));
+              $archived_comps_map = getArchivedComponents($pdo, $missing_comp_ids);
+
               $answered_count = count($s_answers);
               $total_blocks_count = 0;
               if (!empty($sel_stud['selected_program_id'])) {
@@ -987,7 +1040,7 @@ require_once __DIR__ . '/../includes/header.php';
               ?>
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-0">
                 <!-- Response Log and Profile -->
-                <div class="lg:col-span-7 elysian-card p-5 h-full min-h-0 overflow-y-auto custom-scrollbar flex flex-col">
+                <div id="response-log-panel" class="lg:col-span-12 elysian-card p-5 h-full min-h-0 overflow-y-auto custom-scrollbar flex flex-col">
 
                   <!-- Header Container -->
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-200 mb-4 shrink-0">
@@ -1005,6 +1058,10 @@ require_once __DIR__ . '/../includes/header.php';
 
                         <!-- Micro Action Buttons -->
                         <div class="inline-flex items-center gap-1 shrink-0">
+                          <button type="button" onclick="toggleMentorChat()"
+                             class="text-[9px] text-white font-bold px-1.5 py-0.5 bg-indigo-600 border border-indigo-600 rounded hover:bg-indigo-700 transition-colors uppercase tracking-wider inline-flex items-center gap-1">
+                            💬 <?php echo count($s_messages); ?>
+                          </button>
                           <a href="/mentor/index.php?tab=students&edit_student_id=<?php echo urlencode($sel_stud['permanent_id']); ?>"
                              class="text-[9px] text-indigo-600 hover:text-indigo-800 font-bold px-1.5 py-0.5 bg-indigo-50 border border-indigo-200 rounded hover:bg-indigo-100 transition-colors uppercase tracking-wider">
                             Edit
@@ -1117,6 +1174,17 @@ require_once __DIR__ . '/../includes/header.php';
                         <?php foreach ($s_answers as $b_id => $ans): ?>
                           <?php
                           $cmp_info = isset($all_comps_map[$b_id]) ? $all_comps_map[$b_id] : null;
+                          $is_archived = false;
+                          if (!$cmp_info && isset($archived_comps_map[$b_id])) {
+                              $arc = $archived_comps_map[$b_id];
+                              $cmp_info = [
+                                  'question' => $arc['question'],
+                                  'pillar_title' => $arc['pillar_title'],
+                                  'type' => $arc['type'],
+                                  'options' => $arc['options'] ? json_decode($arc['options'], true) : [],
+                              ];
+                              $is_archived = true;
+                          }
                           $q_text = $cmp_info ? $cmp_info['question'] : $b_id;
                           $p_title = $cmp_info ? $cmp_info['pillar_title'] : '';
                           $b_type = $cmp_info ? $cmp_info['type'] : '';
@@ -1135,8 +1203,11 @@ require_once __DIR__ . '/../includes/header.php';
                           ?>
                           <div class="p-2.5 bg-gray-50 border border-gray-200 rounded-lg">
                             <div class="flex justify-between items-start gap-1.5 mb-1">
-                              <span class="text-[8px] font-bold text-brand-gold font-mono uppercase tracking-wider truncate">
+                              <span class="text-[8px] font-bold text-brand-gold font-mono uppercase tracking-wider truncate flex items-center gap-1">
                                 <?php echo htmlspecialchars($b_type ?: 'Block'); ?> &bull; <?php echo htmlspecialchars($p_title); ?>
+                                <?php if ($is_archived): ?>
+                                  <span class="text-red-600 bg-red-50 border border-red-200 px-1 py-0.5 rounded normal-case" title="This question was later removed from the program">Archived</span>
+                                <?php endif; ?>
                               </span>
                               <span class="text-[7px] font-mono text-gray-400 bg-gray-100 px-1 py-0.5 rounded border border-gray-200 shrink-0"><?php echo htmlspecialchars($b_id); ?></span>
                             </div>
@@ -1152,12 +1223,15 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
 
                 <!-- Chat Box panel -->
-                <div class="lg:col-span-5 elysian-card overflow-hidden flex flex-col h-full min-h-0">
+                <div id="support-workspace-panel" class="hidden lg:col-span-12 elysian-card overflow-hidden flex flex-col h-full min-h-0">
                   <div class="p-3 bg-[#EEF8CD]/50 border-b border-gray-200 flex items-center justify-between">
                     <div>
                       <h4 class="text-[10px] font-bold uppercase tracking-wider text-gray-900">Support Workspace</h4>
                       <p class="text-[8px] text-gray-400 font-mono">Chat thread with candidate</p>
                     </div>
+                    <button type="button" onclick="toggleMentorChat()" class="text-gray-400 hover:text-gray-600 text-xs font-bold px-2">
+                      ✕ Close
+                    </button>
                   </div>
 
                   <div id="mentor-chat-messages" class="flex-grow p-4 overflow-y-auto flex flex-col gap-3 bg-gray-50">
@@ -1198,6 +1272,11 @@ require_once __DIR__ . '/../includes/header.php';
 
               <!-- Inline Chat Polling JS for Mentor Dashboard -->
               <script>
+              function toggleMentorChat() {
+                document.getElementById('response-log-panel').classList.toggle('hidden');
+                document.getElementById('support-workspace-panel').classList.toggle('hidden');
+              }
+
               function escapeHtml(str) {
                 const d = document.createElement('div');
                 d.appendChild(document.createTextNode(str));
