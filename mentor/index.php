@@ -2098,11 +2098,7 @@ require_once __DIR__ . '/../includes/header.php';
                       <!-- ══ COMPOSITE BLOCK BUILDER ══════════════════════════════════════ -->
                       <div id="cbs-panel" class="mb-5">
                         <div class="flex items-center justify-between mb-3">
-                          <div class="flex items-center gap-[0.4rem] text-[0.7rem] font-bold text-indigo-600 uppercase tracking-[0.06em]">
-                            <span class="px-[7px] py-0.5 text-[0.6rem] rounded-md bg-gradient-to-br from-indigo-600 to-violet-600 text-white">STACK</span>
-                            FORM BUILDER
-                          </div>
-                          <button type="button" id="cbs-add-btn" onclick="cbsShowTypePicker()" class="flex items-center gap-1.5 px-[0.85rem] py-[0.3rem] text-[0.7rem] font-bold text-white bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg cursor-pointer shadow-sm hover:-translate-y-0.5 transition-all">
+                          <button type="button" id="cbs-add-btn" onclick="cbsShowTypePicker()" class="flex items-center gap-1.0 px-[0.85rem] py-[0.3rem] text-[0.7rem] font-bold text-white bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg cursor-pointer shadow-sm hover:-translate-y-0.5 transition-all">
                             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                             Add Element
                           </button>
@@ -2722,7 +2718,7 @@ require_once __DIR__ . '/../includes/header.php';
                         const optsArr = (elem.options||'Option A, Option B').split(',').map(s=>s.trim()).filter(Boolean);
                         return `<div class="mb-3">
                           ${elem.label ? `<label class="block text-xs font-bold text-gray-700 mb-1">${escapeHtml(elem.label)}${elem.required!==false?' <span class="text-red-500">*</span>':''}</label>` : ''}
-                          <select class="pv-input" disabled><option value="">Select option...</option>${optsArr.map(o=>`<option>${escapeHtml(o)}</option>`).join('')}</select>
+                          <select class="pv-input" style="cursor:pointer;"><option value="">Select option...</option>${optsArr.map(o=>`<option>${escapeHtml(o)}</option>`).join('')}</select>
                         </div>`;
                       } else if (elem.type === 'rating_scale') {
                         return `<div class="mb-3 p-3 bg-gray-50 border border-gray-200 rounded-xl">
@@ -2845,7 +2841,7 @@ require_once __DIR__ . '/../includes/header.php';
                   } else if (type === 'dropdown') {
                     const opts = getPreviewOptions();
                     const optHTML = opts.length ? opts.map(o => `<option>${escapeHtml(o.label)}</option>`).join('') : '<option>Option A</option><option>Option B</option>';
-                    inputHTML = `<select class="pv-input" style="cursor:pointer;" disabled><option value="">Select an option...</option>${optHTML}</select>`;
+                    inputHTML = `<select class="pv-input" style="cursor:pointer;"><option value="">Select an option...</option>${optHTML}</select>`;
                   } else if (type === 'checklist' || type === 'radio_buttons') {
                     const opts = getPreviewOptions();
                     const items = opts.length ? opts : [{label:'Option A'},{label:'Option B'}];
