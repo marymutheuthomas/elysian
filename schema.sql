@@ -89,6 +89,15 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Database-backed PHP session storage (see includes/db_session_handler.php).
+-- Needed because serverless hosting (Vercel) doesn't guarantee local disk
+-- persists between requests, which breaks PHP's default file-based sessions.
+CREATE TABLE IF NOT EXISTS `sessions` (
+  `id` VARCHAR(128) NOT NULL PRIMARY KEY,
+  `data` TEXT NOT NULL,
+  `last_activity` INT UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Snapshot of a component's question/type/options taken right before a mentor
 -- deletes it, so students' previously-submitted answers stay meaningful even
 -- after the source content is gone (student answers are never deleted, but the

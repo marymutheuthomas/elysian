@@ -42,3 +42,24 @@ try {
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
+
+// Store PHP sessions in the database instead of local disk. On Vercel,
+// each request can land on a different serverless container with its own
+// ephemeral filesystem, so a locally-saved session file may not exist on
+// the next request — the student/mentor gets silently logged out mid-use.
+// This must run before any session_start() call, which every entry point
+// already does after requiring this file.
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `sessions` (
+        `id` VARCHAR(128) NOT NULL PRIMARY KEY,
+        `data` TEXT NOT NULL,
+        `last_activity` INT UNSIGNED NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    require_once __DIR__ . '/../includes/db_session_handler.php';
+    $session_lifetime = (int) ini_get('session.gc_maxlifetime');
+    session_set_save_handler(new DbSessionHandler($pdo, $session_lifetime), true);
+} catch (Throwable $t) {
+    // If this ever fails (e.g. restricted DB privileges), fall back to
+    // PHP's default file-based sessions rather than breaking every page.
+}
