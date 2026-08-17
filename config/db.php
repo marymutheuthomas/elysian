@@ -5,15 +5,17 @@ $dbname = getenv('DB_NAME') ?: 'elysian_success';
 $user   = getenv('DB_USER') ?: '6SwLSc9PBJx7qjm.root';
 $pass   = getenv('DB_PASS') ?: 'b69oxALF6wMOGkNk';
 
-// Store the CA bundle in Vercel's writable temporary directory
-$ca_path = sys_get_temp_dir() . '/cacert.pem';
-
-// Download Mozilla's official root CA bundle if missing or incomplete
-if (!file_exists($ca_path) || filesize($ca_path) < 1000) {
-    $ca_data = @file_get_contents('https://curl.se/ca/cacert.pem');
-    if ($ca_data !== false) {
-        file_put_contents($ca_path, $ca_data);
-    }
+// CA bundle is committed to the repo (config/cacert.pem) rather than fetched
+// at request time. The previous approach downloaded it into sys_get_temp_dir()
+// on every cold start; if that fetch silently failed (blocked/slow egress,
+// no network yet during Vercel's PHP init), PDO::MYSQL_ATTR_SSL_CA ended up
+// pointing at a file that didn't exist. mysqlnd doesn't error on that — it
+// just skips SSL entirely, which is exactly what produced TiDB's "insecure
+// transport" rejection. A bundled file removes that failure mode completely:
+// it's part of the deployed source, so it's always present.
+$ca_path = __DIR__ . '/cacert.pem';
+if (!file_exists($ca_path)) {
+    die("Database connection failed: CA bundle missing at $ca_path — expected config/cacert.pem to be committed to the repo.");
 }
 
 // Resolve PHP SSL attributes across PHP versions
@@ -33,7 +35,10 @@ $options = [
 ];
 
 try {
-    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $user, $pass, $options);
+    // sslmode=REQUIRED makes mysqlnd refuse the connection outright if SSL
+    // can't be negotiated, instead of silently falling back to plaintext
+    // (which is what let this fail server-side at TiDB instead of here).
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=REQUIRED", $user, $pass, $options);
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
