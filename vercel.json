@@ -1,13 +1,16 @@
 {
     "functions": {
-        "api/index.php": {
+        "*.php": {
+            "runtime": "vercel-php@0.9.0"
+        },
+        "mentor/*.php": {
             "runtime": "vercel-php@0.9.0"
         }
     },
     "routes": [
         {
-            "src": "/(.*)",
-            "dest": "/api/index.php"
+            "src": "/",
+            "dest": "/index.php"
         }
     ]
 }
