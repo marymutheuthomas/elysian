@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS `students` (
   `raw_scores` TEXT NULL, -- JSON string representing raw trait scores for the evaluation engine
   `archetype_id` VARCHAR(50) NULL, -- FK to archetypes.archetype_id (resolved outcome)
   `registered_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `email_verified` TINYINT(1) NOT NULL DEFAULT 0,
+  `email_verify_token` VARCHAR(64) NULL,
   CONSTRAINT `fk_students_programs` FOREIGN KEY (`selected_program_id`) REFERENCES `programs` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

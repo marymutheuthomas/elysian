@@ -63,3 +63,12 @@ try {
     // If this ever fails (e.g. restricted DB privileges), fall back to
     // PHP's default file-based sessions rather than breaking every page.
 }
+
+// Email verification columns (see register.php / verify_email.php). Guards
+// existing deployed databases that predate schema.sql adding these.
+try {
+    $pdo->exec("ALTER TABLE `students` ADD COLUMN IF NOT EXISTS `email_verified` TINYINT(1) NOT NULL DEFAULT 0");
+    $pdo->exec("ALTER TABLE `students` ADD COLUMN IF NOT EXISTS `email_verify_token` VARCHAR(64) NULL");
+} catch (Throwable $t) {
+    // Non-fatal: worst case, verification tracking silently no-ops.
+}
