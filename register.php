@@ -1,6 +1,7 @@
 <?php
 // register.php
 require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/mailer.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -43,6 +44,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $uin = generateStudentCode($pdo, $name);
             $stmt = $pdo->prepare("INSERT INTO `students` (`permanent_id`, `name`, `email`, `status`, `answers`) VALUES (?, ?, ?, 'program_selection', '{}')");
             $stmt->execute([$uin, $name, $email]);
+
+            // Email the Student Code too — registration still succeeds even
+            // if this fails (e.g. RESEND_API_KEY not configured yet); the
+            // code is always shown on-screen either way.
+            sendEmail(
+                $email,
+                'Your Elysian Success Student Code',
+                '<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">'
+                . '<h2 style="color: #1E293B;">Welcome to Elysian Success, ' . htmlspecialchars($name) . '!</h2>'
+                . '<p>Your personal Student Code is how you log back in — save it somewhere safe.</p>'
+                . '<p style="font-size: 20px; font-weight: bold; letter-spacing: 2px; background: #F1F5F9; padding: 12px 16px; border-radius: 8px; display: inline-block;">'
+                . htmlspecialchars($uin) . '</p>'
+                . '<p>You will need this code to log in at any time — there is no password to reset.</p>'
+                . '</div>'
+            );
 
             // Save UIN to session and display the registration success screen
             $_SESSION['student_id'] = $uin;
