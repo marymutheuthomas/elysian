@@ -53,26 +53,32 @@
         if (form.dataset.ajax) return;
 
         form.addEventListener('submit', function (e) {
-          // A small delay so client-side validation can fire first
+          // Disable synchronously, in the same tick the submit event fires —
+          // a deferred (setTimeout) disable leaves a brief window where a
+          // fast double-click on Save fires two submissions before the first
+          // one has visibly locked the button, which can create two rows
+          // (e.g. IDs generated from time() can differ across the two
+          // requests if they land a second apart).
+          var btn = form.querySelector('[type="submit"]');
+          if (!btn || btn.disabled) {
+            if (btn && btn.disabled) e.preventDefault();
+            return;
+          }
+
+          var originalHTML = btn.innerHTML;
+          var originalWidth = btn.offsetWidth;
+
+          // Lock button width to prevent layout shift
+          btn.style.minWidth = originalWidth + 'px';
+          btn.disabled = true;
+          btn.innerHTML = SPINNER_SVG + 'Please wait…';
+
+          // Failsafe: re-enable after 8 seconds
           setTimeout(function () {
-            var btn = form.querySelector('[type="submit"]');
-            if (!btn || btn.disabled) return;
-
-            var originalHTML = btn.innerHTML;
-            var originalWidth = btn.offsetWidth;
-
-            // Lock button width to prevent layout shift
-            btn.style.minWidth = originalWidth + 'px';
-            btn.disabled = true;
-            btn.innerHTML = SPINNER_SVG + 'Please wait…';
-
-            // Failsafe: re-enable after 8 seconds
-            setTimeout(function () {
-              btn.disabled  = false;
-              btn.innerHTML = originalHTML;
-              btn.style.minWidth = '';
-            }, 8000);
-          }, 0);
+            btn.disabled  = false;
+            btn.innerHTML = originalHTML;
+            btn.style.minWidth = '';
+          }, 8000);
         });
       });
     }

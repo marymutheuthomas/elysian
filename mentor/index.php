@@ -10,6 +10,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Collision-resistant ID for new rows (pillars, blocks, components, programs,
+// etc). time()-based IDs (even with a 2-digit rand() suffix) can collide when
+// a form gets submitted twice in quick succession — a mistaken double-click
+// on Save landing in different seconds silently created two duplicate rows
+// instead of erroring. random_bytes() makes that collision negligible while
+// keeping the same "PREFIX-timestamp-suffix" shape for readability in logs.
+function genId(string $prefix): string {
+    return $prefix . '-' . time() . '-' . bin2hex(random_bytes(4));
+}
+
 $error_msg = '';
 
 // Handle Mentor Login POST
@@ -227,7 +237,7 @@ if ($is_logged_in) {
             $stmt->execute([$code, $title, $description, $outcomes_json, $fee, $duration, $is_active, $scheme_id, $prog_id]);
         } else {
             // Add new program
-            $new_id = 'PROG-' . time();
+            $new_id = genId('PROG');
             try {
                 $pdo->beginTransaction();
                 
@@ -235,11 +245,11 @@ if ($is_logged_in) {
                 $stmt->execute([$new_id, $code, $title, $description, $outcomes_json, $fee, $duration, $is_active, $scheme_id]);
 
                 // Insert default pillar and default block to make it valid immediately
-                $pill_id = 'PILL-' . time() . '-1';
+                $pill_id = genId('PILL');
                 $stmt_pill = $pdo->prepare("INSERT INTO `pillars` (`id`, `program_id`, `title`, `description`) VALUES (?, ?, 'Pillar 1: Introduction Assessment', 'Define your preliminary parameters.')");
                 $stmt_pill->execute([$pill_id, $new_id]);
 
-                $blk_id = 'BLK-' . time() . '-1';
+                $blk_id = genId('BLK');
                 $stmt_blk = $pdo->prepare("INSERT INTO `components` (`id`, `pillar_id`, `type`, `question`, `placeholder`, `required`) VALUES (?, ?, 'free_text', 'What is your primary goal for this program?', 'Describe your objectives...', 1)");
                 $stmt_blk->execute([$blk_id, $pill_id]);
 
@@ -266,7 +276,7 @@ if ($is_logged_in) {
             $stmt->execute([$p_title, $p_cong_note, $p_sort_order, $p_pillar_id]);
         } else {
             // Add
-            $new_pillar_id = 'PILL-' . time();
+            $new_pillar_id = genId('PILL');
             // Get highest sort_order for this program
             $stmt_ord = $pdo->prepare("SELECT COALESCE(MAX(sort_order),0)+1 FROM `pillars` WHERE `program_id` = ?");
             $stmt_ord->execute([$p_program_id]);
@@ -295,7 +305,7 @@ if ($is_logged_in) {
             $pdo->prepare("UPDATE `blocks` SET `title` = ? WHERE `id` = ?")->execute([$nb_title, $nb_block_id]);
         } else {
             // Create new named block
-            $new_nb_id = 'BLK-' . time() . '-' . rand(10,99);
+            $new_nb_id = genId('BLK');
             $stmt_ord  = $pdo->prepare("SELECT COALESCE(MAX(sort_order),0)+1 FROM `blocks` WHERE `pillar_id` = ?");
             $stmt_ord->execute([$nb_pillar_id]);
             $auto_ord  = (int)$stmt_ord->fetchColumn();
@@ -530,7 +540,7 @@ if ($is_logged_in) {
             $stmt->execute([$b_type, $b_question, $b_placeholder, $b_required, $show_if_val, $options_val, $config_val, $content_schema_val, $b_named_blk_id ?: null, $b_block_id]);
         } else {
             // Add new component
-            $new_comp_id = 'COMP-' . time() . '-' . rand(10,99);
+            $new_comp_id = genId('COMP');
             $stmt_ord = $pdo->prepare("SELECT COALESCE(MAX(sort_order),0)+1 FROM `components` WHERE `pillar_id` = ?");
             $stmt_ord->execute([$b_pillar_id]);
             $auto_comp_ord = (int)$stmt_ord->fetchColumn();
@@ -569,7 +579,7 @@ if ($is_logged_in) {
             $stmt->execute([$b_id]);
             $src = $stmt->fetch();
             if ($src) {
-                $new_blk_id = 'COMP-' . time() . '-' . rand(10, 99);
+                $new_blk_id = genId('COMP');
                 $ins = $pdo->prepare("INSERT INTO `components` (`id`, `pillar_id`, `block_id`, `type`, `question`, `placeholder`, `required`, `show_if`, `options`, `config`, `content_schema`, `sort_order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $ins->execute([
                     $new_blk_id,
