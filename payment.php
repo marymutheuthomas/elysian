@@ -67,11 +67,18 @@ $stmt_pay = $pdo->prepare("SELECT * FROM `payments` WHERE `student_permanent_id`
 $stmt_pay->execute([$student_id, $program_id]);
 $payment = $stmt_pay->fetch();
 
+// A rejected payment should not be a dead end — the student needs a way to
+// submit a corrected reference, not just see "pending" forever.
+$can_submit = !$payment || $payment['status'] === 'rejected';
+
 $error_msg = '';
 
 // Process form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$payment) {
-    $ttid = isset($_POST['ttid']) ? trim($_POST['ttid']) : '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $can_submit) {
+    // Server-side safety net matching the client-side cleanup below, in case
+    // JS didn't run: collapse whitespace/newlines and uppercase.
+    $ttid_raw = isset($_POST['ttid']) ? trim($_POST['ttid']) : '';
+    $ttid = strtoupper(preg_replace('/\s+/', ' ', $ttid_raw));
 
     if (empty($ttid)) {
         $error_msg = 'Please enter your Transaction ID (TTID).';
@@ -79,7 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$payment) {
         try {
             $pdo->beginTransaction();
 
-            $payment_id = 'PAY-' . time();
+            // Random suffix avoids two submissions in the same second
+            // colliding on the same ID (e.g. a resubmission right after a
+            // rejection, or a double-clicked Submit button).
+            $payment_id = 'PAY-' . time() . '-' . bin2hex(random_bytes(4));
             $amount = $program['fee'];
 
             // Insert payment record
@@ -114,11 +124,18 @@ require_once __DIR__ . '/includes/header.php';
     <!-- Card -->
     <div class="elysian-card p-8 bg-white/80 glass shadow-xl rounded-3xl">
       
-      <?php if (!$payment): ?>
+      <?php if ($can_submit): ?>
         <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">Unlock Assessment</h1>
         <p class="text-xs text-slate-400 text-center mb-6">
           Enter your Transaction ID (TTID) to unlock validation.
         </p>
+
+        <?php if ($payment && $payment['status'] === 'rejected'): ?>
+          <div class="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600">
+            Your previous submission (TTID: <strong><?php echo htmlspecialchars($payment['ttid']); ?></strong>) could not be verified.
+            Please double-check your reference number and try again.
+          </div>
+        <?php endif; ?>
 
         <?php if (!empty($error_msg)): ?>
           <div class="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600">
@@ -154,16 +171,50 @@ require_once __DIR__ . '/includes/header.php';
             <input
               type="text"
               name="ttid"
-              placeholder="Enter wire/payment reference number"
-              class="elysian-input text-center font-mono tracking-wide focus:outline-none focus:ring-2 focus:ring-[#3F00FF] focus:border-[#3F00FF]"
+              id="ttid-input"
+              placeholder="e.g. QGH7I2K3L4 — M-Pesa, PayPal, or wire reference"
+              class="elysian-input text-center font-mono tracking-wide uppercase focus:outline-none focus:ring-2 focus:ring-[#3F00FF] focus:border-[#3F00FF]"
+              autocomplete="off"
               required
             />
+            <p id="ttid-paste-hint" class="hidden text-[11px] text-amber-600 text-center">
+              Looks like you pasted more than just the code — please paste just the transaction reference.
+            </p>
           </div>
 
           <button type="submit" class="group w-full inline-flex items-center justify-center gap-2 mt-2 py-3.5 rounded-xl font-bold text-white bg-[#3F00FF] hover:bg-[#2E00B3] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
             Submit Verification
           </button>
         </form>
+
+        <script>
+        (function() {
+          // Students usually copy-paste straight from their SMS/email
+          // confirmation. Safe universal cleanup (trim, collapse whitespace,
+          // uppercase) works for every provider's reference format — M-Pesa,
+          // PayPal, bank wire. We deliberately don't try to auto-extract a
+          // code from a longer pasted message (e.g. the whole M-Pesa SMS):
+          // guessing wrong for an unfamiliar format (PayPal, wire refs) would
+          // silently submit the wrong value. Instead we just flag it and let
+          // the student fix it themselves.
+          var input = document.getElementById('ttid-input');
+          var hint = document.getElementById('ttid-paste-hint');
+          if (!input) return;
+
+          function cleanAndCheck() {
+            var cleaned = input.value.replace(/\s+/g, ' ').trim().toUpperCase();
+            if (cleaned !== input.value) {
+              input.value = cleaned;
+            }
+            if (hint) hint.classList.toggle('hidden', !cleaned.includes(' '));
+          }
+
+          input.addEventListener('input', cleanAndCheck);
+          input.addEventListener('paste', function() {
+            setTimeout(cleanAndCheck, 0);
+          });
+        })();
+        </script>
       <?php else: ?>
         <div class="text-center py-4 animate-fade-in">
           <div class="w-16 h-16 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center mx-auto mb-5 animate-pulse">
