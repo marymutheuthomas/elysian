@@ -1497,12 +1497,27 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 
     <!-- Save & Advance → Primary CTA -->
-    <?php if ($currentComp['type'] === 'scoring_block'): ?>
+    <?php
+    // A component's `type` can say scoring_block while its actual content
+    // was authored through the composite/content_schema builder (a
+    // trait_matrix element) instead of the legacy options-based sub-question
+    // array. When that happens the main question area (further up) already
+    // renders the composite path — but this button used to key off `type`
+    // alone, rendering the legacy disabled-until-4-answers button whose
+    // enabling JS watches for .sq-option-card/#sq-progress-text elements
+    // that don't exist in the composite markup. Net effect: the button
+    // never enabled no matter what the student answered. Checking
+    // $content_schema here too (same check the content area already makes)
+    // keeps the two in agreement.
+    $sb_is_legacy_scoring = ($currentComp['type'] === 'scoring_block') && empty($content_schema);
+    ?>
+    <?php if ($sb_is_legacy_scoring): ?>
+      <?php $sb_is_final_step = ($active_index === count($visibleComponents) - 1); ?>
       <button type="submit" form="main-form" id="sb-submit-btn"
         class="elysian-btn elysian-btn-brand px-6 py-2.5 text-xs font-bold shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-        Complete Assessment →
+        <?php echo $sb_is_final_step ? 'Complete Assessment →' : 'Save & Advance →'; ?>
       </button>
-    <?php elseif (in_array($currentComp['type'], ['content_only', 'content_block', 'video_embed', 'callout_box', 'resource_link', 'h1', 'h2', 'h3', 'h4', 'paragraph', 'result_reveal', 'composite'])): ?>
+    <?php elseif (in_array($currentComp['type'], ['content_only', 'content_block', 'video_embed', 'callout_box', 'resource_link', 'h1', 'h2', 'h3', 'h4', 'paragraph', 'result_reveal', 'composite']) || !empty($content_schema)): ?>
       <button type="submit" form="main-form" class="elysian-btn elysian-btn-brand px-6 py-2.5 text-xs font-bold shadow-md flex items-center gap-2">
         Continue →
       </button>
