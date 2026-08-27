@@ -357,6 +357,7 @@ if ($is_logged_in) {
         if (is_array($items) && !empty($items)) {
             $placeholders = [];
             $params = [];
+            $comp_ids = [];
             foreach ($items as $item) {
                 $comp_id  = trim($item['id'] ?? '');
                 $block_id = !empty($item['block_id']) ? trim($item['block_id']) : null;
@@ -366,15 +367,31 @@ if ($is_logged_in) {
                     $params[] = $comp_id;
                     $params[] = $block_id;
                     $params[] = $sort_ord;
+                    $comp_ids[] = $comp_id;
                 }
             }
 
             if (!empty($placeholders)) {
-                $sql = "INSERT INTO `components` (`id`, `block_id`, `sort_order`) VALUES " 
-                     . implode(', ', $placeholders) 
+                $sql = "INSERT INTO `components` (`id`, `block_id`, `sort_order`) VALUES "
+                     . implode(', ', $placeholders)
                      . " ON DUPLICATE KEY UPDATE `sort_order` = VALUES(`sort_order`), `block_id` = VALUES(`block_id`)";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute($params);
+
+                // Keep pillar_id in sync with whatever pillar block_id actually
+                // belongs to, scoped to just the components in this batch. The
+                // tree UI now blocks cross-pillar drops, but this guarantees the
+                // two columns can never silently disagree — which is what let a
+                // moved component start appearing under the wrong pillar for
+                // students despite the mentor's own tree still (incorrectly)
+                // grouping it under the old one.
+                $sync_placeholders = implode(',', array_fill(0, count($comp_ids), '?'));
+                $sync_stmt = $pdo->prepare(
+                    "UPDATE `components` c JOIN `blocks` b ON c.block_id = b.id
+                     SET c.pillar_id = b.pillar_id
+                     WHERE c.id IN ($sync_placeholders)"
+                );
+                $sync_stmt->execute($comp_ids);
             }
             echo json_encode(['status' => 'success', 'updated_count' => count($placeholders)]);
         } else {
@@ -1929,7 +1946,7 @@ require_once __DIR__ . '/../includes/header.php';
                           </div>
 
                           <!-- Tier 4: Components inside Named Block (Item Nodes) -->
-                          <div class="block-grid ml-2 pl-2 border-l border-indigo-300 comp-drop-zone" id="blk-list-<?php echo htmlspecialchars($nb['id']); ?>" data-block-id="<?php echo htmlspecialchars($nb['id']); ?>">
+                          <div class="block-grid ml-2 pl-2 border-l border-indigo-300 comp-drop-zone" id="blk-list-<?php echo htmlspecialchars($nb['id']); ?>" data-block-id="<?php echo htmlspecialchars($nb['id']); ?>" data-pillar-id="<?php echo htmlspecialchars($pil['id']); ?>">
                             <?php if (count($nb['components']) === 0): ?>
                               <p class="text-gray-400 text-[9px] italic py-1 empty-block-msg">Empty block.</p>
                             <?php else: ?>
@@ -1966,7 +1983,7 @@ require_once __DIR__ . '/../includes/header.php';
                                   default => 'bg-gray-100 text-gray-700 border-gray-300'
                                 };
                                 ?>
-                                <div class="ely-tree-item p-2 rounded-md bg-white border border-gray-200 flex items-center justify-between gap-2 cursor-pointer min-w-0 <?php echo $is_active_comp ? 'active' : ''; ?>" draggable="true" data-comp-id="<?php echo htmlspecialchars($blk['id']); ?>" data-block-id="<?php echo htmlspecialchars($nb['id']); ?>">
+                                <div class="ely-tree-item p-2 rounded-md bg-white border border-gray-200 flex items-center justify-between gap-2 cursor-pointer min-w-0 <?php echo $is_active_comp ? 'active' : ''; ?>" draggable="true" data-comp-id="<?php echo htmlspecialchars($blk['id']); ?>" data-block-id="<?php echo htmlspecialchars($nb['id']); ?>" data-pillar-id="<?php echo htmlspecialchars($pil['id']); ?>">
                                   <div class="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
                                     <!-- Visual drag handle -->
                                     <span class="text-gray-400 font-bold text-xs cursor-grab select-none font-mono flex-shrink-0">⋮⋮</span>
@@ -3125,6 +3142,14 @@ require_once __DIR__ . '/../includes/header.php';
                 if (!draggedComp || draggedComp === this) return;
 
                 const parentZone = this.closest('.comp-drop-zone');
+                // A component can be reordered or moved to a different block,
+                // but never to a different pillar — the tree shows every
+                // pillar's blocks at once, so it's easy to drift across a
+                // pillar boundary by accident, which silently moved a
+                // question into someone else's pillar with no warning.
+                if (parentZone && parentZone.dataset.pillarId !== draggedComp.dataset.pillarId) {
+                  return;
+                }
                 if (parentZone) {
                   const rect = this.getBoundingClientRect();
                   const offset = e.clientY - rect.top;
@@ -3153,6 +3178,8 @@ require_once __DIR__ . '/../includes/header.php';
                 e.preventDefault();
                 this.classList.remove('bg-indigo-50/50');
                 if (!draggedComp) return;
+                // Same-pillar guard as the item-level drop handler above.
+                if (this.dataset.pillarId !== draggedComp.dataset.pillarId) return;
 
                 // Move component into target drop zone if not already dropped inside child handler
                 if (e.target === this || e.target.classList.contains('empty-block-msg')) {
@@ -3168,25 +3195,26 @@ require_once __DIR__ . '/../includes/header.php';
           // Batch collect updated sort_order and block_id, then fire single JSON AJAX request
           function saveBatchComponentOrder(zone) {
             const pillarTree = zone.closest('#pillars-list') || document;
-            const allItems = pillarTree.querySelectorAll('.ely-tree-item');
+            const allZones = pillarTree.querySelectorAll('.comp-drop-zone');
             const payload = [];
 
-            // Compute global/block-level sort_order across all components in the active tree
-            let currentOrder = 1;
-            allItems.forEach(item => {
-              const compId = item.dataset.compId;
-              const parentZone = item.closest('.comp-drop-zone');
-              const blockId = parentZone ? parentZone.dataset.blockId : item.dataset.blockId;
-
-              if (compId) {
-                // Update local dataset blockId if moved across blocks
-                if (blockId) item.dataset.blockId = blockId;
+            // sort_order is scoped per block, not one global counter across
+            // every pillar's blocks — each zone restarts its own count so
+            // reordering inside one block never rewrites the relative order
+            // of components living in every other block in the tree.
+            allZones.forEach(dropZone => {
+              let currentOrder = 1;
+              const blockId = dropZone.dataset.blockId;
+              dropZone.querySelectorAll(':scope > .ely-tree-item').forEach(item => {
+                const compId = item.dataset.compId;
+                if (!compId) return;
+                item.dataset.blockId = blockId;
                 payload.push({
                   id: compId,
                   block_id: blockId || null,
                   sort_order: currentOrder++
                 });
-              }
+              });
             });
 
             if (payload.length === 0) return;
