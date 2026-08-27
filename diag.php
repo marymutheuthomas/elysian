@@ -29,7 +29,12 @@ if (file_exists($ca_path)) {
 
 echo "[4] CONNECTION TEST (via config/db.php):\n";
 try {
-    require __DIR__ . '/config/db.php';
+    // @ suppresses a harmless session_set_save_handler() warning specific to
+    // this page: the header() call above makes headers_sent() report true
+    // by the time config/db.php tries to register the DB session handler,
+    // which real pages never hit since they require config/db.php first.
+    // It doesn't affect the connection test result either way.
+    @require __DIR__ . '/config/db.php';
     $ver = $pdo->query('SELECT VERSION() as v')->fetch();
     echo "SUCCESS — connected. Server version: " . $ver['v'] . "\n";
     $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
