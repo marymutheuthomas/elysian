@@ -34,13 +34,30 @@ $options = [
     $ssl_verify_key              => false,
 ];
 
-try {
-    // sslmode=REQUIRED makes mysqlnd refuse the connection outright if SSL
-    // can't be negotiated, instead of silently falling back to plaintext
-    // (which is what let this fail server-side at TiDB instead of here).
-    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=REQUIRED", $user, $pass, $options);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+// Retry a few times before giving up. This won't help if there's genuinely
+// no network path to TiDB (e.g. your machine's own DNS/internet is down —
+// no amount of retrying from inside PHP fixes that), but it does ride out
+// brief, transient blips — a DNS resolver hiccup, a momentary gateway
+// timeout — instead of failing the whole page on the first stumble.
+$max_attempts = 3;
+$last_exception = null;
+for ($attempt = 1; $attempt <= $max_attempts; $attempt++) {
+    try {
+        // sslmode=REQUIRED makes mysqlnd refuse the connection outright if SSL
+        // can't be negotiated, instead of silently falling back to plaintext
+        // (which is what let this fail server-side at TiDB instead of here).
+        $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=REQUIRED", $user, $pass, $options);
+        $last_exception = null;
+        break;
+    } catch (PDOException $e) {
+        $last_exception = $e;
+        if ($attempt < $max_attempts) {
+            usleep(300000); // 300ms
+        }
+    }
+}
+if ($last_exception) {
+    die("Database connection failed: " . $last_exception->getMessage());
 }
 
 // Store PHP sessions in the database instead of local disk. On Vercel,
