@@ -42,18 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $uin = generateStudentCode($pdo, $name);
-            $verify_token = bin2hex(random_bytes(32));
-            $stmt = $pdo->prepare("INSERT INTO `students` (`permanent_id`, `name`, `email`, `status`, `answers`, `email_verify_token`) VALUES (?, ?, ?, 'program_selection', '{}', ?)");
-            $stmt->execute([$uin, $name, $email, $verify_token]);
+            $stmt = $pdo->prepare("INSERT INTO `students` (`permanent_id`, `name`, `email`, `status`, `answers`) VALUES (?, ?, ?, 'program_selection', '{}')");
+            $stmt->execute([$uin, $name, $email]);
 
-            // Email the Student Code and a verify-your-email link together.
-            // Verification here is tracked, not enforced — the student can
-            // proceed immediately regardless of whether/when they click it.
-            // Registration still succeeds even if the email itself fails to
-            // send (e.g. RESEND_API_KEY not configured yet); the code is
-            // always shown on-screen either way.
-            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-            $verify_link = $scheme . '://' . $_SERVER['HTTP_HOST'] . '/verify_email.php?token=' . urlencode($verify_token);
+            // Email the Student Code. Registration still succeeds even if
+            // this fails (e.g. RESEND_API_KEY not configured yet); the code
+            // is always shown on-screen either way.
             sendEmail(
                 $email,
                 'Your Elysian Success Student Code',
@@ -63,8 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 . '<p style="font-size: 20px; font-weight: bold; letter-spacing: 2px; background: #F1F5F9; padding: 12px 16px; border-radius: 8px; display: inline-block;">'
                 . htmlspecialchars($uin) . '</p>'
                 . '<p>You will need this code to log in at any time — there is no password to reset.</p>'
-                . '<p style="margin-top:24px;">One more thing — please confirm this is your email address:</p>'
-                . '<p><a href="' . htmlspecialchars($verify_link) . '" style="display:inline-block; background:#3F00FF; color:#fff; text-decoration:none; padding:10px 20px; border-radius:8px; font-weight:bold;">Verify My Email</a></p>'
                 . '</div>'
             );
 
